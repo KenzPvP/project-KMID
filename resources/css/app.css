@@ -1,0 +1,233 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../views/**/*.blade.php';
+
+@theme {
+  --color-kmid-blue: #004ADA;
+  --color-kmid-blue-hover: #003FBA;
+  --color-kmid-blue-light: #0C5EFF;
+  --color-kmid-blue-accent: #3C7EFF;
+  --color-kmid-blue-dark: #00297A;
+  --color-kmid-navy: #001E5A;
+  
+  --color-kmid-orange: #FEA515;
+  --color-kmid-orange-hover: #EE9401;
+  --color-kmid-orange-light: #FFEDD0;
+  
+  --color-kmid-gray-100: #E9E9E9;
+  --color-kmid-gray-200: #D5D5D5;
+  --color-kmid-gray-700: #707070;
+  --color-kmid-dark: #1F1F1F;
+  
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+:root {
+  --kmid-blue: #004ADA;
+  --kmid-orange: #FEA515;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: #1F1F1F;
+  background-color: #FFFFFF;
+  overflow-x: hidden;
+}
+
+/* Custom Utilities & Animations */
+.hero-bg-pattern {
+  display: flex;
+  min-height: 100svh;
+  align-items: center;
+  background-image: url('/images/desainKMID/Hi-fi-design/Vector%20(2).svg');
+  background-size: cover;
+  background-position: center;
+}
+
+.hero-bg-pattern > .max-w-6xl {
+  width: 100%;
+}
+
+.pattern-bg {
+  background-color: #f7f9ff;
+  background-image: linear-gradient(rgba(255, 255, 255, .08), rgba(255, 255, 255, .08)), url('/images/desainKMID/Hi-fi-design/Vector%20(2).svg');
+  background-size: 100% auto;
+  background-repeat: repeat-y;
+  background-position: center;
+  background-blend-mode: normal, multiply;
+}
+
+.hero-bg-pattern,
+.pattern-bg {
+  position: relative;
+  isolation: isolate;
+}
+
+.hero-bg-pattern::before,
+.pattern-bg::before {
+  position: absolute;
+  z-index: -1;
+  width: 25rem;
+  height: 25rem;
+  border-radius: 9999px;
+  background: #FEA515;
+  content: '';
+  filter: blur(90px);
+  opacity: .22;
+  pointer-events: none;
+}
+
+.hero-bg-pattern::before { top: 8rem; left: 4%; }
+.pattern-bg::before { top: 18%; right: 8%; background: #5B92FF; opacity: .16; }
+
+#program::after,
+#faq::after {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background-image: url('/images/desainKMID/Hi-fi-design/Vector%20(2).svg');
+  background-position: center top;
+  background-size: 100% auto;
+  background-repeat: repeat-y;
+  content: '';
+  filter: contrast(5) brightness(.9);
+  mix-blend-mode: multiply;
+  opacity: 1;
+  pointer-events: none;
+}
+
+.section-heading {
+  margin: 0 auto 2rem;
+  color: #004ADA;
+  font-size: clamp(2.3rem, 5vw, 4.8rem);
+  font-weight: 700;
+  letter-spacing: -.05em;
+  line-height: 1;
+  text-align: center;
+}
+
+.section-heading-light { color: #fff; margin-left: 0; text-align: left; }
+
+#about::before,
+#achievements::before,
+#faq::before {
+  position: absolute;
+  width: 30rem;
+  height: 30rem;
+  border-radius: 9999px;
+  content: '';
+  filter: blur(105px);
+  opacity: .22;
+  pointer-events: none;
+}
+
+#about::before { top: 18%; right: -10rem; background: #5B92FF; }
+#achievements::before { top: 5%; left: -12rem; background: #FEA515; opacity: .14; }
+#faq::before { right: -10rem; bottom: 6%; background: #5B92FF; opacity: .14; }
+
+.home-rectangle-ornament,
+.achievements-rectangle-ornament {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.home-rectangle-ornament {
+  top: 7rem;
+  left: -3rem;
+  width: clamp(15rem, 32vw, 26rem);
+  opacity: .72;
+  filter: drop-shadow(0 0 20px rgba(254, 165, 21, .35));
+}
+
+.home-rectangle-ornament-right {
+  top: 22rem;
+  right: 15%;
+  left: auto;
+  width: clamp(10rem, 19vw, 16rem);
+  opacity: .64;
+  transform: rotate(12deg);
+}
+
+.achievements-rectangle-ornament {
+  top: 7rem;
+  left: -5rem;
+  width: clamp(14rem, 29vw, 25rem);
+  opacity: .7;
+  filter: drop-shadow(0 0 22px rgba(254, 165, 21, .38));
+}
+
+.section-transition-ornament {
+  position: relative;
+  z-index: 4;
+  width: 100%;
+  height: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.section-transition-ornament img {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+  filter: drop-shadow(0 0 18px rgba(254, 165, 21, .45));
+}
+
+.about-program-ornament img {
+  right: -3rem;
+  bottom: -6rem;
+  width: clamp(7rem, 12vw, 13.5rem);
+  transform: rotate(180deg);
+}
+
+.achievements-faq-ornament img {
+  right: 5%;
+  bottom: -7rem;
+  width: clamp(8rem, 15vw, 17rem);
+}
+
+#home > .max-w-6xl,
+#achievements > .max-w-7xl {
+  position: relative;
+  z-index: 1;
+}
+
+#achievements > .max-w-7xl > div {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 700px) {
+  .about-program-ornament img { right: -1.5rem; bottom: -4rem; width: 6rem; }
+  .achievements-faq-ornament img { right: 1rem; bottom: -5rem; width: 8rem; }
+  .home-rectangle-ornament { top: 8rem; left: -5rem; width: 16rem; }
+  .home-rectangle-ornament-right { top: 24rem; right: -3rem; left: auto; width: 10rem; }
+  .achievements-rectangle-ornament { left: -6rem; width: 18rem; }
+}
+
+/* Accordion Smooth Height Transition */
+.accordion-content {
+  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, padding 0.3s ease;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #004ADA;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #003FBA;
+}
