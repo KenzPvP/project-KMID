@@ -1,0 +1,46 @@
+import re
+import xml.etree.ElementTree as ET
+
+with open('public/images/desainKMID/Hi-fi-design/Landing Page.svg', 'r', encoding='utf-8') as f:
+    content = f.read()
+
+root = ET.fromstring(content)
+
+targets = [
+    ('title_tentang_kmid', 1380, 330, 240, 90),
+    ('title_programs', 1380, 1910, 240, 90),
+    ('title_achievments', 150, 2950, 480, 110),
+    ('title_faqs', 1380, 3800, 240, 90),
+]
+
+# Extract defs
+defs_match = re.search(r'<defs>.*?</defs>', content, re.DOTALL)
+defs_str = defs_match.group(0) if defs_match else ''
+
+for name, x, y, w, h in targets:
+    # We create clean SVG with viewBox = x y w h
+    svg_content = f'''<svg width="{w}" height="{h}" viewBox="{x} {y} {w} {h}" fill="none" xmlns="http://www.w3.org/2000/svg">
+{defs_str}
+'''
+    # Find elements inside bounds x..x+w, y..y+h
+    for path in root.iter('{http://www.w3.org/2000/svg}path'):
+        d = path.attrib.get('d', '')
+        numbers = re.findall(r'[-+]?\d*\.\d+|\d+', d)
+        if len(numbers) >= 4:
+            coords = [float(n) for n in numbers]
+            xs = coords[0::2]
+            ys = coords[1::2]
+            if xs and ys:
+                px_min, px_max = min(xs), max(xs)
+                py_min, py_max = min(ys), max(ys)
+                # Check if path overlaps target box
+                if (x - 20 <= px_min <= x + w + 20) and (y - 20 <= py_min <= y + h + 20):
+                    raw_elem = ET.tostring(path, encoding='utf-8').decode('utf-8')
+                    svg_content += '  ' + raw_elem + '\n'
+                    
+    svg_content += '</svg>'
+    
+    out_file = f'public/images/desainKMID/titles/{name}.svg'
+    with open(out_file, 'w', encoding='utf-8') as f_out:
+        f_out.write(svg_content)
+    print(f"Generated {out_file} with viewBox '{x} {y} {w} {h}'")

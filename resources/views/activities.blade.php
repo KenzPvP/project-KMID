@@ -15,51 +15,7 @@
 <body class="antialiased text-[#1F1F1F] bg-white selection:bg-[#004ADA] selection:text-white">
 
     <!-- SITE HEADER / NAVBAR -->
-    <header id="site-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-5 px-4 sm:px-8 lg:px-16">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <!-- Brand Logo -->
-            <a href="{{ route('home') }}" class="inline-block transition-transform duration-300 hover:scale-105" aria-label="KMID Home">
-                <img src="{{ asset('images/desainKMID/Hi-fi-design/Frame 1686560881.svg') }}" alt="KMID - Komunitas Mahasiswa Inovasi Digital" class="h-10 sm:h-12 w-auto">
-            </a>
-
-            <!-- Desktop Nav Links -->
-            <nav class="hidden md:flex items-center gap-8 lg:gap-10">
-                <a href="{{ route('home') }}" class="text-base font-medium text-[#1F1F1F] transition-colors hover:text-[#004ADA]">Home</a>
-                <a href="{{ route('about') }}" class="text-base font-medium text-[#1F1F1F] transition-colors hover:text-[#004ADA]">About</a>
-                <a href="{{ route('activities') }}" class="text-base font-semibold text-[#004ADA] transition-colors hover:text-[#003FBA]">Activities</a>
-                <a href="{{ route('home') }}#achievements" class="text-base font-medium text-[#1F1F1F] transition-colors hover:text-[#004ADA]">Impact</a>
-                <a href="{{ route('home') }}#faq" class="text-base font-medium text-[#1F1F1F] transition-colors hover:text-[#004ADA]">Information</a>
-            </nav>
-
-            <!-- CTA Button -->
-            <div class="hidden md:block">
-                <a href="#agenda" class="inline-flex items-center justify-center px-6 py-2.5 bg-[#FEA515] text-white font-semibold text-sm rounded-full transition-all duration-300 hover:bg-[#EE9401] hover:shadow-lg hover:shadow-orange-500/25 active:scale-95">
-                    Join KMID
-                </a>
-            </div>
-
-            <!-- Mobile Hamburger Toggle -->
-            <button id="menu-toggle" type="button" class="md:hidden p-2 rounded-lg text-[#004ADA] hover:bg-blue-50 focus:outline-none" aria-label="Buka Menu Navigation" aria-expanded="false">
-                <svg id="menu-icon" class="w-7 h-7 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                </svg>
-            </button>
-        </div>
-
-        <!-- Mobile Drawer Menu -->
-        <div id="mobile-menu" class="hidden md:hidden flex-col gap-4 mt-4 p-6 bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-slate-100">
-            <a href="{{ route('home') }}" class="text-base font-medium text-[#1F1F1F] hover:text-[#004ADA]">Home</a>
-            <a href="{{ route('about') }}" class="text-base font-medium text-[#1F1F1F] hover:text-[#004ADA]">About</a>
-            <a href="{{ route('activities') }}" class="text-base font-semibold text-[#004ADA]">Activities</a>
-            <a href="{{ route('home') }}#achievements" class="text-base font-medium text-[#1F1F1F] hover:text-[#004ADA]">Impact</a>
-            <a href="{{ route('home') }}#faq" class="text-base font-medium text-[#1F1F1F] hover:text-[#004ADA]">Information</a>
-            <div class="pt-2 border-t border-slate-100">
-                <a href="#agenda" class="block w-full text-center px-5 py-3 bg-[#FEA515] text-white font-semibold text-sm rounded-full shadow-md">
-                    Join KMID
-                </a>
-            </div>
-        </div>
-    </header>
+    @include('layouts.navbar')
 
     <main>
         {{-- ============================================= --}}
@@ -609,7 +565,7 @@
                             <li><a href="{{ route('home') }}" class="text-blue-100/80 hover:text-white transition-colors">Home</a></li>
                             <li><a href="{{ route('about') }}" class="text-blue-100/80 hover:text-white transition-colors">About</a></li>
                             <li><a href="{{ route('activities') }}" class="text-blue-100/80 hover:text-white transition-colors">Activities</a></li>
-                            <li><a href="{{ route('home') }}#achievements" class="text-blue-100/80 hover:text-white transition-colors">Impact</a></li>
+                            <li><a href="{{ route('impact') }}" class="text-blue-100/80 hover:text-white transition-colors">Impact</a></li>
                             <li><a href="{{ route('home') }}#faq" class="text-blue-100/80 hover:text-white transition-colors">Information</a></li>
                         </ul>
                     </div>
