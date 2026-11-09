@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth overflow-x-hidden">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login | KMID - Komunitas Mahasiswa Inovasi Digital</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+
+    <link rel="preload" as="style" href="http://127.0.0.1:8008/build/assets/app-BYdizYmf.css" /><link rel="modulepreload" as="script" href="http://127.0.0.1:8008/build/assets/app-DGFAG3On.js" /><link rel="stylesheet" href="http://127.0.0.1:8008/build/assets/app-BYdizYmf.css" /><script type="module" src="http://127.0.0.1:8008/build/assets/app-DGFAG3On.js"></script><script id="browser-logger-active">
+(function() {
+    const ENDPOINT = 'http://127.0.0.1:8008/_boost/browser-logs';
+    const logQueue = [];
+    let flushTimeout = null;
+    const captureTypes = ["error","warning","info","log","debug","table"];
+
+    console.log('🔍 Browser logger active (MCP server detected). Posting to: ' + ENDPOINT);
+
+    // Store original console methods
+    const originalConsole = {
+        log: console.log,
+        debug: console.debug,
+        info: console.info,
+        error: console.error,
+        warn: console.warn,
+        table: console.table
+    };
+
+    // Walk own enumerable keys so JSON.stringify cannot auto-invoke a proxy fake toJSON (e.g. Livewire's `$wire`) and fire a real request.
+    function toSafeValue(value, seen) {
+        if (value === null || typeof value !== 'object') {
+            return value;
+        }
+        if (value instanceof Error) {
+            return { name: value.name, message: value.message, stack: value.stack };
+        }
+        // Date has no own enumerable keys, so the walk below would collapse it to {}.
+        if (value instanceof Date) {
+            return value.toISOString();
+        }
+        if (seen.has(value)) {
+            return '[Circular]';
+        }
+        seen.add(value);
+        if (Array.isArray(value)) {
+            return value.map((item) => toSafeValue(item, seen));
+        }
+        const plain = {};
+        for (const key of Object.keys(value)) {
+            if (key === 'toJSON') continue;
+            try {
+                plain[key] = toSafeValue(value[key], seen);
+            } catch (e) {
+                plain[key] = '[Unreadable]';
+            }
+        }
+        return plain;
+    }
+
+    // Helper to safely stringify values
+    function safeStringify(obj) {
+        return JSON.stringify(toSafeValue(obj, new WeakSet()));
+    }
+
+    // Normalize log type for consistency (e.g., 'warn' to 'warning')
+    function normalizeType(type) {
+        return type === 'warn' ? 'warning' : type;
+    }
+
+    // Determine if a log type should be captured based on configured levels
+    function shouldCapture(type) {
+        return captureTypes.includes(normalizeType(type));
+    }
+
+    // Batch and send logs
+    function flushLogs() {
+        if (logQueue.length === 0) return;
+
+        const batch = logQueue.splice(0, logQueue.length);
+
+        fetch(ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ logs: batch })
+        }).catch(err => {
+            // Silently fail to avoid infinite loops
+            originalConsole.error('Failed to send logs:', err);
+        });
+    }
+
+    // Debounced flush (100ms)
+    function scheduleFlush() {
+        if (flushTimeout) clearTimeout(flushTimeout);
+        flushTimeout = setTimeout(flushLogs, 100);
+    }
+
+    // Intercept console methods
+    ['log', 'debug', 'info', 'error', 'warn', 'table'].forEach(method => {
+        console[method] = function(...args) {
+            // Call original method
+            originalConsole[method].apply(console, args);
+
+            // Capture log data
+            try {
+                if (!shouldCapture(method)) {
+                    return;
+                }
+
+                logQueue.push({
+                    type: method,
+                    timestamp: new Date().toISOString(),
+                    data: args.map(arg => {
+                        try {
+                            return typeof arg === 'object' ? JSON.parse(safeStringify(arg)) : arg;
+                        } catch (e) {
+                            return String(arg);
+                        }
+                    }),
+                    url: window.location.href,
+                    userAgent: navigator.userAgent
+                });
+
+                scheduleFlush();
+            } catch (e) {
+                // Fail silently
+            }
+        };
+    });
+
+    // Global error handlers for uncaught errors
+    const originalOnError = window.onerror;
+    window.onerror = function boostErrorHandler(errorMsg, url, lineNumber, colNumber, error) {
+        try {
+            if (shouldCapture('error')) {
+                logQueue.push({
+                    type: 'uncaught_error',
+                    timestamp: new Date().toISOString(),
+                    data: [{
+                        message: errorMsg,
+                        filename: url,
+                        lineno: lineNumber,
+                        colno: colNumber,
+                        error: error ? {
+                            name: error.name,
+                            message: error.message,
+                            stack: error.stack
+                        } : null
+                    }],
+                    url: window.location.href,
+                    userAgent: navigator.userAgent
+                });
+
+                scheduleFlush();
+            }
+
+        } catch (e) {
+            // Fail silently
+        }
+
+        // Call original handler if it exists
+        if (originalOnError && typeof originalOnError === 'function') {
+            return originalOnError(errorMsg, url, lineNumber, colNumber, error);
+        }
+
+        // Let the error continue to propagate
+        return false;
+    }
+    window.addEventListener('error', (event) => {
+        try {
+            if (!shouldCapture('error')) {
+                return false;
+            }
+
+            logQueue.push({
+                type: 'window_error',
+                timestamp: new Date().toISOString(),
+                data: [{
+                    message: event.message,
+                    filename: event.filename,
+                    lineno: event.lineno,
+                    colno: event.colno,
+                    error: event.error ? {
+                        name: event.error.name,
+                        message: event.error.message,
+                        stack: event.error.stack
+                    } : null
+                }],
+                url: window.location.href,
+                userAgent: navigator.userAgent
+            });
+
+            scheduleFlush();
+        } catch (e) {
+            // Fail silently
+        }
+
+        // Let the error continue to propagate
+        return false;
+    });
+    window.addEventListener('unhandledrejection', (event) => {
+        try {
+            if (!shouldCapture('error')) {
+                return false;
+            }
+
+            logQueue.push({
+                type: 'error',
+                timestamp: new Date().toISOString(),
+                data: [{
+                    message: 'Unhandled Promise Rejection',
+                    reason: toSafeValue(event.reason, new WeakSet())
+                }],
+                url: window.location.href,
+                userAgent: navigator.userAgent
+            });
+
+            scheduleFlush();
+        } catch (e) {
+            // Fail silently
+        }
+
+        // Let the rejection continue to propagate
+        return false;
+    });
+
+    // Flush on page unload
+    window.addEventListener('beforeunload', () => {
+        if (logQueue.length > 0) {
+            navigator.sendBeacon(ENDPOINT, JSON.stringify({ logs: logQueue }));
+        }
+    });
+})();
+</script>
+</head>
+<body class="antialiased text-[#1F1F1F] bg-white selection:bg-[#004ADA] selection:text-white font-['Plus_Jakarta_Sans',sans-serif] overflow-x-hidden w-full">
+
+    <!-- Fullscreen Auth Screen Container -->
+    <div class="min-h-screen flex flex-col justify-between relative overflow-hidden bg-white w-full">
+        
+        <!-- Background Atmospheric Glow -->
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-80 bg-[radial-gradient(ellipse_at_top,rgba(12,94,255,0.07),transparent_70%)] pointer-events-none z-0" aria-hidden="true"></div>
+
+        <!-- Decorative Background Layer (Clipped cleanly to container) -->
+        <div class="absolute inset-0 pointer-events-none overflow-hidden select-none z-0" aria-hidden="true">
+            <!-- Contour Wave Background (Figma Vector (2).svg) -->
+            <img src="http://127.0.0.1:8008/images/desainKMID/Hi-fi-design/Vector (2).svg" alt="" class="w-full h-full object-cover opacity-75">
+
+            <!-- Decorative Blurred Starbursts from Figma -->
+            <div class="absolute -left-20 sm:-left-28 lg:-left-36 top-1/2 -translate-y-1/2 w-72 sm:w-96 lg:w-[480px]">
+                <img src="http://127.0.0.1:8008/images/desainKMID/Hi-fi-design/Star 2.svg" alt="" class="w-full h-auto">
+            </div>
+            <div class="absolute -right-16 sm:-right-24 lg:-right-32 -top-12 sm:-top-16 w-64 sm:w-88 lg:w-[440px]">
+                <img src="http://127.0.0.1:8008/images/desainKMID/Hi-fi-design/Star 2.svg" alt="" class="w-full h-auto rotate-45">
+            </div>
+        </div>
+
+        <!-- SITE HEADER / NAVBAR (Uses layout navbar) -->
+        <!-- AUTH SITE HEADER / NAVBAR (Exact Match with Figma UI/UX Design) -->
+    <header id="site-header" class="w-full py-5 sm:py-8 px-4 sm:px-12 lg:px-20 relative z-30 transition-all duration-300">
+        <div class="w-full max-w-[1440px] mx-auto flex items-center justify-between">
+            <!-- Back Arrow Button -->
+            <a href="http://127.0.0.1:8008" class="inline-flex items-center justify-center p-2 rounded-xl text-[#1F1F1F] hover:text-[#004ADA] hover:bg-slate-100/60 transition-all duration-200 group focus:outline-none focus:ring-2 focus:ring-blue-500/20" aria-label="Kembali ke Beranda">
+                <svg class="w-6 h-6 sm:w-8 sm:h-8 transform transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+            </a>
+
+            <!-- Brand Logo -->
+            <a href="http://127.0.0.1:8008" class="inline-block transition-transform duration-300 hover:scale-105" aria-label="KMID Home">
+                <img src="http://127.0.0.1:8008/images/desainKMID/Hi-fi-design/Frame 1686560881.svg" alt="KMID - Komunitas Mahasiswa Inovasi Digital" class="h-8 sm:h-11 w-auto">
+            </a>
+        </div>
+    </header>
+
+        <!-- MAIN CONTENT (Centered Vertically and Horizontally) -->
+        <main class="flex-1 flex items-center justify-center relative z-10 px-4 sm:px-10 lg:px-16 py-6 sm:py-10 w-full overflow-hidden">
+            <div class="max-w-[1240px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
+                
+                <!-- Left Headline Column -->
+                <div class="lg:col-span-6 flex flex-col justify-center">
+                    <!-- Status Tag -->
+                    <div class="inline-flex items-center gap-2.5 mb-4 sm:mb-6">
+                        <span class="w-2.5 h-2.5 rounded-full bg-[#FEA515]"></span>
+                        <span class="text-xs sm:text-sm font-bold tracking-wider text-[#004ADA] uppercase">LOGIN KMID</span>
+                    </div>
+
+                    <!-- Headline -->
+                    <h1 class="text-3xl sm:text-5xl lg:text-[56px] font-extrabold text-[#1F1F1F] tracking-tight leading-[1.12]">
+                        Selamat datang<br>
+                        di <span class="text-[#FEA515]">KMID</span><span class="text-[#FEA515]">.</span>
+                    </h1>
+
+                    <!-- Subtitle / Description -->
+                    <p class="mt-4 sm:mt-6 text-sm sm:text-base font-medium text-[#004ADA] max-w-md leading-relaxed">
+                        Masuk ke akunmu dan lanjutkan perjalanan inovasi digital bersama KMID.
+                    </p>
+                </div>
+
+                <!-- Right Login Card Column -->
+                <div class="lg:col-span-6 flex justify-center lg:justify-end">
+                    <div class="bg-white rounded-[24px] sm:rounded-3xl p-6 sm:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.06)] border border-slate-100 max-w-[460px] w-full mx-auto">
+                        <h2 class="text-2xl sm:text-3xl font-bold text-[#1F1F1F] tracking-tight">Login</h2>
+                        <p class="text-xs sm:text-sm text-[#707070] mt-1.5 mb-6 sm:mb-8 font-normal">Gunakan email dan kata sandi akun KMID kamu.</p>
+
+                        <form action="http://127.0.0.1:8008/login" method="POST" class="space-y-4">
+                            <input type="hidden" name="_token" value="HeWp0QpwqKASVoEzaqgiZxslzh8aFPOphB6jeom8" autocomplete="off">                            
+                            <!-- Email Field -->
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-[#1F1F1F] mb-1.5">Email</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#9CA3AF]">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                        </svg>
+                                    </div>
+                                    <input type="email" id="email" name="email" required placeholder="Masukkan email kamu" class="w-full pl-11 pr-4 py-3 bg-white border border-[#E2E8F0] rounded-xl text-sm text-[#1F1F1F] placeholder-[#9CA3AF] focus:outline-none focus:border-[#004ADA] focus:ring-2 focus:ring-blue-500/20 transition-all">
+                                </div>
+                            </div>
+
+                            <!-- Kata Sandi Field -->
+                            <div>
+                                <label for="password" class="block text-sm font-medium text-[#1F1F1F] mb-1.5">Kata Sandi</label>
+                                <div class="relative">
+                                    <input type="password" id="password" name="password" required placeholder="Masukkan kata sandi" class="w-full pl-4 pr-11 py-3 bg-white border border-[#E2E8F0] rounded-xl text-sm text-[#1F1F1F] placeholder-[#9CA3AF] focus:outline-none focus:border-[#004ADA] focus:ring-2 focus:ring-blue-500/20 transition-all">
+                                    <button type="button" id="toggle-password" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[#9CA3AF] hover:text-[#1F1F1F] transition-colors focus:outline-none" aria-label="Toggle password visibility">
+                                        <svg id="eye-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Lupa Kata Sandi -->
+                            <div class="flex justify-end pt-0.5">
+                                <a href="#" class="text-xs sm:text-sm font-medium text-[#004ADA] hover:text-[#003FBA] hover:underline transition-colors">Lupa kata sandi?</a>
+                            </div>
+
+                            <!-- Submit Button Masuk -->
+                            <button type="submit" class="w-full py-3.5 px-4 bg-[#FEA515] hover:bg-[#EE9401] active:scale-[0.99] text-white font-semibold text-sm sm:text-base rounded-xl transition-all duration-200 shadow-md shadow-orange-500/25 mt-2">
+                                Masuk
+                            </button>
+
+                            <!-- Google Button -->
+                            <button type="button" class="w-full py-3.5 px-4 bg-[#0C5EFF] hover:bg-[#004ADA] active:scale-[0.99] text-white font-semibold text-sm sm:text-base rounded-xl transition-all duration-200 flex items-center justify-center gap-3 shadow-md shadow-blue-500/20 mt-3">
+                                <svg class="w-5 h-5 fill-white shrink-0" viewBox="0 0 24 24">
+                                    <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/>
+                                </svg>
+                                <span>Lanjutkan dengan Google</span>
+                            </button>
+                        </form>
+
+                        <!-- Footer Switch to Register -->
+                        <div class="mt-8 text-center text-xs sm:text-sm text-[#1F1F1F]">
+                            Belum memiliki akun? <a href="http://127.0.0.1:8008/register" class="font-semibold text-[#004ADA] hover:text-[#003FBA] hover:underline transition-colors">Daftar</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Subtle bottom spacer -->
+        <div class="h-6 sm:h-10 pointer-events-none"></div>
+    </div>
+
+    <!-- SITE FOOTER (Uses layout footer) -->
+    <!-- FOOTER SECTION -->
+    <footer class="bg-[#00297A] text-white pt-16 pb-8 border-t border-blue-900/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 pb-12">
+                <!-- Left Info (Col 1-7) -->
+                <div class="lg:col-span-7">
+                    <a href="http://127.0.0.1:8008" class="inline-block mb-5">
+                        <img src="http://127.0.0.1:8008/images/desainKMID/Hi-fi-design/Frame 1686560881.svg" alt="KMID Footer Logo" class="h-12 w-auto brightness-0 invert">
+                    </a>
+                    <address class="not-italic text-blue-100/80 text-sm sm:text-base leading-relaxed max-w-md">
+                        Bulaksumur, Caturtunggal, Kapanewon Depok,<br>
+                        Kabupaten Sleman, Daerah Istimewa<br>
+                        Yogyakarta 55281.
+                    </address>
+
+                    <!-- Social Media Links -->
+                    <div class="flex items-center gap-3 mt-6">
+                        <!-- Instagram -->
+                        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="w-10 h-10 bg-[#0C5EFF] hover:bg-[#3C7EFF] rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 shadow-md" aria-label="Instagram KMID">
+                            <svg class="w-5 h-5 fill-current text-white" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                        </a>
+                        <!-- YouTube -->
+                        <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" class="w-10 h-10 bg-[#0C5EFF] hover:bg-[#3C7EFF] rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 shadow-md" aria-label="YouTube KMID">
+                            <svg class="w-5 h-5 fill-current text-white" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                        </a>
+                        <!-- X (Twitter) -->
+                        <a href="https://x.com" target="_blank" rel="noopener noreferrer" class="w-10 h-10 bg-[#0C5EFF] hover:bg-[#3C7EFF] rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 shadow-md" aria-label="X KMID">
+                            <svg class="w-4 h-4 fill-current text-white" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                        </a>
+                        <!-- TikTok -->
+                        <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" class="w-10 h-10 bg-[#0C5EFF] hover:bg-[#3C7EFF] rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 shadow-md" aria-label="TikTok KMID">
+                            <svg class="w-4 h-4 fill-current text-white" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.82.56-1.36 1.52-1.4 2.52-.06 1.25.54 2.49 1.54 3.19 1 .7 2.37.82 3.46.3 1.02-.48 1.71-1.5 1.77-2.62.06-2.96.02-5.92.03-8.88 0-3.08-.01-6.16.01-9.24z"/></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Right Nav Columns (Col 8-12) -->
+                <div class="lg:col-span-5 grid grid-cols-2 gap-8">
+                    <!-- Page Links Column -->
+                    <div>
+                        <h4 class="font-bold text-base text-white mb-4 tracking-wider">Page</h4>
+                        <ul class="space-y-2.5 text-sm">
+                            <li><a href="http://127.0.0.1:8008" class="text-blue-100/80 hover:text-white transition-colors">Home</a></li>
+                            <li><a href="http://127.0.0.1:8008/about" class="text-blue-100/80 hover:text-white transition-colors">About</a></li>
+                            <li><a href="http://127.0.0.1:8008/activities" class="text-blue-100/80 hover:text-white transition-colors">Activities</a></li>
+                            <li><a href="http://127.0.0.1:8008/impact" class="text-blue-100/80 hover:text-white transition-colors">Impact</a></li>
+                            <li><a href="http://127.0.0.1:8008/information" class="text-blue-100/80 hover:text-white transition-colors">Information</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Support Column -->
+                    <div>
+                        <h4 class="font-bold text-base text-white mb-4 tracking-wider">Support</h4>
+                        <ul class="space-y-2.5 text-sm">
+                            <li><a href="http://127.0.0.1:8008#faq" class="text-blue-100/80 hover:text-white transition-colors">FAQ</a></li>
+                            <li><a href="mailto:kmid@ugm.ac.id" class="text-blue-100/80 hover:text-white transition-colors">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Line & Copyright -->
+            <div class="border-t border-blue-900/60 pt-8 text-center text-xs sm:text-sm text-blue-200/70">
+                <p>&copy; KMID. All rights reserved</p>
+            </div>
+        </div>
+    </footer>
+    <!-- Interactive JS for Password Toggle -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.getElementById('toggle-password');
+            const passInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eye-icon');
+            
+            if (toggleBtn && passInput && eyeIcon) {
+                toggleBtn.addEventListener('click', () => {
+                    const isPassword = passInput.type === 'password';
+                    passInput.type = isPassword ? 'text' : 'password';
+                    if (isPassword) {
+                        eyeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/>`;
+                    } else {
+                        eyeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>`;
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
