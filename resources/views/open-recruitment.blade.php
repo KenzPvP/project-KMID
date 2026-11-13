@@ -283,7 +283,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                     </svg>
                                     <span>
-                                        <strong class="font-semibold text-[#1F1F1F]">Catatan:</strong> Bagian <strong>Pengisian Jadwal Wawancara</strong> akan terbuka otomatis setelah berkas Anda disetujui (ACC) oleh Admin.
+                                        <strong class="font-semibold text-[#1F1F1F]">Catatan:</strong> Pastikan Anda mengisi data diri dan mengunggah berkas pendaftaran dengan benar dan teliti sebelum dikirimkan.
                                     </span>
                                 </div>
                             @endif
