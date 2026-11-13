@@ -268,8 +268,8 @@
                         <!-- Profile & Role Switcher Popup Menu -->
                         <div id="profile-dropdown-panel" class="hidden absolute right-0 mt-3 w-72 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50 divide-y divide-gray-100">
                             <div class="px-4 py-3">
-                                <p class="text-xs font-semibold text-[#1F1F1F]">Tariq Hifzhillah</p>
-                                <p class="text-[11px] text-[#8E8E93]">tariq.h@ugm.ac.id</p>
+                                <p class="text-xs font-semibold text-[#1F1F1F]">{{ auth()->user()->name ?? 'Admin KMID' }}</p>
+                                <p class="text-[11px] text-[#8E8E93]">{{ auth()->user()->email ?? 'admin@mail.ugm.ac.id' }}</p>
                                 <div class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold {{ $isStaff ? 'bg-amber-50 text-[#FEA515]' : 'bg-blue-50 text-[#004ADA]' }}">
                                     <span class="w-1.5 h-1.5 rounded-full {{ $isStaff ? 'bg-[#FEA515]' : 'bg-[#004ADA]' }}"></span>
                                     Role Aktif: {{ $isStaff ? 'Staff / Manager' : 'Administrator' }}
@@ -317,6 +317,9 @@
                             <div class="py-1">
                                 <a href="{{ route('home') }}" class="block px-4 py-2 text-xs text-[#707070] hover:text-[#1F1F1F] hover:bg-slate-50 transition-colors">
                                     Kembali ke Beranda Publik
+                                </a>
+                                <a href="{{ route('logout') }}" class="block px-4 py-2 text-xs text-red-600 hover:bg-red-50 transition-colors font-medium">
+                                    Keluar (Logout)
                                 </a>
                             </div>
                         </div>

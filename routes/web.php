@@ -27,6 +27,18 @@ Route::get('/information', function () {
 })->name('information');
 
 Route::get('/login', function () {
+    if (Auth::check()) {
+        $user = Auth::user();
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.pendaftar.index');
+        }
+        if ($user->role === 'staff') {
+            return redirect()->route('staff.pendaftar.index');
+        }
+
+        return redirect()->route('home');
+    }
+
     return view('login');
 })->name('login');
 
@@ -39,6 +51,18 @@ Route::post('/login', function (Request $request) {
     if (Auth::attempt($credentials)) {
         $request->session()->regenerate();
 
+        $user = Auth::user();
+
+        // Redirect langsung ke dashboard admin jika akun admin
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.pendaftar.index');
+        }
+
+        // Redirect ke dashboard staff jika akun staff
+        if ($user->role === 'staff') {
+            return redirect()->route('staff.pendaftar.index');
+        }
+
         return redirect()->intended(route('home'));
     }
 
@@ -48,6 +72,18 @@ Route::post('/login', function (Request $request) {
 });
 
 Route::get('/register', function () {
+    if (Auth::check()) {
+        $user = Auth::user();
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.pendaftar.index');
+        }
+        if ($user->role === 'staff') {
+            return redirect()->route('staff.pendaftar.index');
+        }
+
+        return redirect()->route('home');
+    }
+
     return view('register');
 })->name('register');
 
@@ -62,10 +98,20 @@ Route::post('/register', function (Request $request) {
         'name' => $validated['name'],
         'email' => $validated['email'],
         'password' => $validated['password'],
+        'role' => 'pendaftar',
+        'is_active' => true,
     ]);
 
     return redirect()->route('login')->with('success', 'Pendaftaran akun berhasil. Silakan masuk menggunakan akun Anda.');
 });
+
+Route::match(['get', 'post'], '/logout', function (Request $request) {
+    Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    return redirect()->route('login')->with('success', 'Anda telah berhasil keluar.');
+})->name('logout');
 
 Route::get('/open-recruitment', function () {
     return view('open-recruitment');
@@ -75,10 +121,14 @@ Route::get('/oprec', function () {
     return view('open-recruitment');
 })->name('oprec');
 
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/', function () {
         return redirect()->route('admin.pendaftar.index');
     })->name('index');
+
+    Route::get('/dashboard', function () {
+        return redirect()->route('admin.pendaftar.index');
+    })->name('dashboard');
 
     Route::get('/kelola-akun', function () {
         return view('admin.kelola-akun-pendaftar');
@@ -130,10 +180,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
 });
 
 // Route Group: Role Staff / Manager (Hanya Pengelolaan Pendaftaran, Tidak Bisa Mengelola Konten)
-Route::prefix('staff')->name('staff.')->group(function () {
+Route::prefix('staff')->name('staff.')->middleware(['auth', 'role:staff'])->group(function () {
     Route::get('/', function () {
         return redirect()->route('staff.pendaftar.index');
     })->name('index');
+
+    Route::get('/dashboard', function () {
+        return redirect()->route('staff.pendaftar.index');
+    })->name('dashboard');
 
     Route::get('/kelola-akun', function () {
         return view('admin.kelola-akun-pendaftar');
