@@ -38,7 +38,7 @@ Route::get('/login', function () {
             return redirect()->route('staff.pendaftar.index');
         }
 
-        return redirect()->route('home');
+        return redirect()->route('open-recruitment');
     }
 
     return view('login');
@@ -48,6 +48,9 @@ Route::post('/login', function (Request $request) {
     $credentials = $request->validate([
         'email' => ['required', 'string', 'email', new UgmEmail],
         'password' => ['required', 'string'],
+    ], [
+        'email.required' => 'Email wajib diisi.',
+        'password.required' => 'Kata sandi wajib diisi.',
     ]);
 
     if (Auth::attempt($credentials)) {
@@ -65,7 +68,8 @@ Route::post('/login', function (Request $request) {
             return redirect()->route('staff.pendaftar.index');
         }
 
-        return redirect()->intended(route('home'));
+        // Redirect ke dashboard oprec jika akun user biasa / pendaftar
+        return redirect()->route('open-recruitment');
     }
 
     return back()->withErrors([
@@ -83,7 +87,7 @@ Route::get('/register', function () {
             return redirect()->route('staff.pendaftar.index');
         }
 
-        return redirect()->route('home');
+        return redirect()->route('open-recruitment');
     }
 
     return view('register');
@@ -94,6 +98,13 @@ Route::post('/register', function (Request $request) {
         'name' => ['required', 'string', 'max:150'],
         'email' => ['required', 'string', 'email', 'max:191', 'unique:users,email', new UgmEmail],
         'password' => ['required', 'string', 'min:8', 'confirmed'],
+    ], [
+        'name.required' => 'Nama lengkap wajib diisi.',
+        'email.required' => 'Email wajib diisi.',
+        'email.unique' => 'Email ini sudah terdaftar. Silakan masuk menggunakan akun Anda.',
+        'password.required' => 'Kata sandi wajib diisi.',
+        'password.min' => 'Kata sandi minimal 8 karakter.',
+        'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
     ]);
 
     $user = User::create([
@@ -104,7 +115,7 @@ Route::post('/register', function (Request $request) {
         'is_active' => true,
     ]);
 
-    return redirect()->route('login')->with('success', 'Pendaftaran akun berhasil. Silakan masuk menggunakan akun Anda.');
+    return redirect()->route('login')->with('success', 'Pendaftaran akun berhasil! Silakan masuk menggunakan akun Anda untuk melanjutkan ke Dashboard Oprec.');
 });
 
 Route::match(['get', 'post'], '/logout', function (Request $request) {
@@ -116,11 +127,17 @@ Route::match(['get', 'post'], '/logout', function (Request $request) {
 })->name('logout');
 
 Route::get('/open-recruitment', function () {
+    if (!Auth::check()) {
+        return redirect()->route('login')->withErrors([
+            'email' => 'Silakan masuk terlebih dahulu untuk mengakses Dashboard Pendaftaran (Oprec).',
+        ]);
+    }
+
     return view('open-recruitment');
 })->name('open-recruitment');
 
 Route::get('/oprec', function () {
-    return view('open-recruitment');
+    return redirect()->route('open-recruitment');
 })->name('oprec');
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {

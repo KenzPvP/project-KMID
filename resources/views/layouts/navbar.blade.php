@@ -60,8 +60,8 @@
                             Dashboard Staff
                         </a>
                     @else
-                        <a href="{{ route('login') }}" class="inline-flex items-center justify-center px-6 py-2.5 bg-[#FEA515] text-white font-semibold text-sm rounded-full transition-all duration-300 hover:bg-[#EE9401] hover:shadow-lg hover:shadow-orange-500/25 active:scale-95">
-                            Join KMID
+                        <a href="{{ route('open-recruitment') }}" class="inline-flex items-center justify-center px-6 py-2.5 bg-[#FEA515] text-white font-semibold text-sm rounded-full transition-all duration-300 hover:bg-[#EE9401] hover:shadow-lg hover:shadow-orange-500/25 active:scale-95">
+                            Dashboard Oprec
                         </a>
                     @endif
                 @else
@@ -112,8 +112,8 @@
                             Dashboard Staff
                         </a>
                     @else
-                        <a href="{{ route('login') }}" class="block w-full text-center px-5 py-3 bg-[#FEA515] text-white font-semibold text-sm rounded-full shadow-md">
-                            Join KMID
+                        <a href="{{ route('open-recruitment') }}" class="block w-full text-center px-5 py-3 bg-[#FEA515] text-white font-semibold text-sm rounded-full shadow-md">
+                            Dashboard Oprec
                         </a>
                     @endif
                 @else

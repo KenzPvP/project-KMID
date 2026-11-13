@@ -133,21 +133,56 @@
                         </svg>
                     </button>
 
-                    <!-- User Profile Item -->
-                    <div class="flex items-center gap-3 pl-2 sm:pl-3 border-l border-gray-100">
-                        <!-- Profile Avatar -->
-                        <div class="w-8 sm:w-9 h-8 sm:h-9 rounded-full bg-[#004ADA] text-white font-bold flex items-center justify-center text-xs sm:text-sm shadow-sm select-none">
-                            {{ strtoupper(substr(auth()->user()->name ?? 'M', 0, 1)) }}
+                    <!-- User Profile Item with Dropdown -->
+                    <div class="relative">
+                        <button type="button" id="profile-dropdown-btn" class="flex items-center gap-3 pl-2 sm:pl-3 border-l border-gray-100 hover:opacity-85 transition-opacity focus:outline-none cursor-pointer" aria-label="Menu profil">
+                            <!-- Profile Avatar -->
+                            <div class="w-8 sm:w-9 h-8 sm:h-9 rounded-full bg-[#004ADA] text-white font-bold flex items-center justify-center text-xs sm:text-sm shadow-sm select-none">
+                                {{ strtoupper(substr(auth()->user()->name ?? 'P', 0, 1)) }}
+                            </div>
+                            <!-- Profile Texts -->
+                            <div class="hidden sm:block text-left leading-tight">
+                                <div class="text-xs sm:text-sm font-semibold text-[#1F1F1F]">{{ auth()->user()->name ?? 'Pendaftar KMID' }}</div>
+                                <div class="text-[11px] text-[#9CA3AF]">
+                                    @if(auth()->check() && auth()->user()->role === 'admin')
+                                        Administrator
+                                    @elseif(auth()->check() && auth()->user()->role === 'staff')
+                                        Staff KMID
+                                    @else
+                                        Akun Mahasiswa (Pendaftar)
+                                    @endif
+                                </div>
+                            </div>
+                            <!-- Dropdown Chevron -->
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+
+                        <!-- Profile Dropdown Panel -->
+                        <div id="profile-dropdown-panel" class="hidden absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50 divide-y divide-gray-100">
+                            <div class="px-4 py-3">
+                                <p class="text-xs font-semibold text-[#1F1F1F]">{{ auth()->user()->name ?? 'Pendaftar' }}</p>
+                                <p class="text-[11px] text-[#8E8E93] truncate">{{ auth()->user()->email ?? '-' }}</p>
+                                <div class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-[#004ADA]">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#004ADA]"></span>
+                                    Role: {{ ucfirst(auth()->user()->role ?? 'pendaftar') }}
+                                </div>
+                            </div>
+                            <div class="py-1">
+                                <a href="{{ route('home') }}" class="block px-4 py-2 text-xs text-[#707070] hover:text-[#1F1F1F] hover:bg-slate-50 transition-colors">
+                                    Kembali ke Beranda
+                                </a>
+                                @if(auth()->check() && (auth()->user()->role === 'admin' || auth()->user()->role === 'staff'))
+                                    <a href="{{ auth()->user()->role === 'admin' ? route('admin.pendaftar.index') : route('staff.pendaftar.index') }}" class="block px-4 py-2 text-xs text-[#004ADA] hover:bg-blue-50 transition-colors font-semibold">
+                                        Ke Dashboard Pengelolaan
+                                    </a>
+                                @endif
+                                <a href="{{ route('logout') }}" class="block px-4 py-2 text-xs text-red-600 hover:bg-red-50 transition-colors font-medium">
+                                    Keluar (Logout)
+                                </a>
+                            </div>
                         </div>
-                        <!-- Profile Texts -->
-                        <div class="hidden sm:block text-left leading-tight">
-                            <div class="text-xs sm:text-sm font-semibold text-[#1F1F1F]">{{ auth()->user()->name ?? 'Tariq Hifzhillah' }}</div>
-                            <div class="text-[11px] text-[#9CA3AF]">{{ auth()->check() && auth()->user()->role === 'admin' ? 'Administrator' : 'Akun mahasiswa' }}</div>
-                        </div>
-                        <!-- Dropdown Chevron -->
-                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                        </svg>
                     </div>
                 </div>
             </header>
@@ -779,6 +814,21 @@
 
             setupDropzone('cv-dropzone', 'file_cv', 'cv-filename');
             setupDropzone('porto-dropzone', 'file_porto', 'porto-filename');
+
+            // Profile Dropdown Toggle
+            const profileBtn = document.getElementById('profile-dropdown-btn');
+            const profilePanel = document.getElementById('profile-dropdown-panel');
+            if (profileBtn && profilePanel) {
+                profileBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    profilePanel.classList.toggle('hidden');
+                });
+                document.addEventListener('click', (e) => {
+                    if (!profilePanel.contains(e.target) && !profileBtn.contains(e.target)) {
+                        profilePanel.classList.add('hidden');
+                    }
+                });
+            }
         });
     </script>
 </body>

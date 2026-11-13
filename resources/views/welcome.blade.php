@@ -55,8 +55,8 @@
                                 Dashboard Staff
                             </a>
                         @else
-                            <a href="{{ route('login') }}" class="inline-flex items-center justify-center px-8 py-3.5 bg-[#FEA515] text-white font-semibold text-sm sm:text-base rounded-xl transition-all duration-300 hover:bg-[#EE9401] hover:shadow-xl hover:shadow-orange-500/30 hover:-translate-y-0.5 active:translate-y-0">
-                                Join KMID
+                            <a href="{{ route('open-recruitment') }}" class="inline-flex items-center justify-center px-8 py-3.5 bg-[#FEA515] text-white font-semibold text-sm sm:text-base rounded-xl transition-all duration-300 hover:bg-[#EE9401] hover:shadow-xl hover:shadow-orange-500/30 hover:-translate-y-0.5 active:translate-y-0">
+                                Dashboard Oprec
                             </a>
                         @endif
                     @else
