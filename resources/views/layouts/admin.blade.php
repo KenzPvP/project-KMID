@@ -246,11 +246,11 @@
                         <button type="button" id="profile-dropdown-btn" class="flex items-center gap-3 pl-2 sm:pl-3 border-l border-gray-100 hover:opacity-85 transition-opacity focus:outline-none cursor-pointer" aria-label="Menu profil">
                             <!-- Profile Avatar -->
                             <div class="w-8 sm:w-9 h-8 sm:h-9 rounded-full bg-[#004ADA] text-white font-bold flex items-center justify-center text-xs sm:text-sm shadow-sm select-none">
-                                T
+                                {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
                             </div>
                             <!-- Profile Texts -->
                             <div class="hidden sm:block text-left leading-tight">
-                                <div class="text-xs sm:text-sm font-semibold text-[#1F1F1F]">Tariq Hifzhillah</div>
+                                <div class="text-xs sm:text-sm font-semibold text-[#1F1F1F]">{{ auth()->user()->name ?? 'Admin KMID' }}</div>
                                 <div class="text-[11px] text-[#9CA3AF]">
                                     @hasSection('profile_role')
                                         @yield('profile_role')

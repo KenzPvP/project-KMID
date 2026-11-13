@@ -137,12 +137,12 @@
                     <div class="flex items-center gap-3 pl-2 sm:pl-3 border-l border-gray-100">
                         <!-- Profile Avatar -->
                         <div class="w-8 sm:w-9 h-8 sm:h-9 rounded-full bg-[#004ADA] text-white font-bold flex items-center justify-center text-xs sm:text-sm shadow-sm select-none">
-                            T
+                            {{ strtoupper(substr(auth()->user()->name ?? 'M', 0, 1)) }}
                         </div>
                         <!-- Profile Texts -->
                         <div class="hidden sm:block text-left leading-tight">
-                            <div class="text-xs sm:text-sm font-semibold text-[#1F1F1F]">Tariq Hifzhillah</div>
-                            <div class="text-[11px] text-[#9CA3AF]">Akun mahasiswa</div>
+                            <div class="text-xs sm:text-sm font-semibold text-[#1F1F1F]">{{ auth()->user()->name ?? 'Tariq Hifzhillah' }}</div>
+                            <div class="text-[11px] text-[#9CA3AF]">{{ auth()->check() && auth()->user()->role === 'admin' ? 'Administrator' : 'Akun mahasiswa' }}</div>
                         </div>
                         <!-- Dropdown Chevron -->
                         <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -464,7 +464,7 @@
                                 <!-- 1. Nama Lengkap -->
                                 <div>
                                     <label class="block text-sm font-semibold text-[#1F1F1F] mb-1.5">1. Nama Lengkap</label>
-                                    <input type="text" value="Ahmad Tariq Hifzhillah" disabled readonly class="w-full px-4 py-3 bg-[#ECECEC] border border-transparent rounded-xl text-sm text-[#555555] font-medium cursor-not-allowed select-none">
+                                    <input type="text" value="{{ auth()->user()->name ?? 'Ahmad Tariq Hifzhillah' }}" disabled readonly class="w-full px-4 py-3 bg-[#ECECEC] border border-transparent rounded-xl text-sm text-[#555555] font-medium cursor-not-allowed select-none">
                                 </div>
 
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
