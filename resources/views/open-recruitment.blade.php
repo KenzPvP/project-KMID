@@ -1,3 +1,7 @@
+@php
+    $isBerkasDiterima = $pendaftar && in_array($pendaftar->status, ['Lolos Berkas', 'Lolos Wawancara', 'Diterima']);
+    $hasRegistered = !empty($pendaftar);
+@endphp
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
 <head>
@@ -74,7 +78,8 @@
                         <div class="indicator-bar w-1.5 h-6 bg-[#004ADA] rounded-full"></div>
                     </button>
 
-                    <!-- Nav Item 2: Pengisian Jadwal Wawancara -->
+                    <!-- Nav Item 2: Pengisian Jadwal Wawancara (Hanya muncul jika berkas sudah disetujui / di-ACC admin) -->
+                    @if($isBerkasDiterima)
                     <button type="button" id="nav-btn-wawancara" class="portal-nav-item w-full flex items-center justify-between px-3.5 py-3 rounded-xl transition-all duration-200 text-left group text-[#707070] hover:bg-slate-50 hover:text-[#1F1F1F]">
                         <div class="flex items-center gap-3">
                             <!-- Calendar Icon -->
@@ -88,6 +93,7 @@
                         <!-- Active Indicator Bar (Hidden by default on inactive) -->
                         <div class="indicator-bar w-1.5 h-6 bg-[#004ADA] rounded-full hidden"></div>
                     </button>
+                    @endif
                 </nav>
             </div>
 
@@ -201,6 +207,74 @@
                 <section id="section-pendaftaran" class="portal-section w-full max-w-[880px] relative z-10">
                     <div class="bg-white rounded-[24px] sm:rounded-[28px] p-6 sm:p-10 lg:p-12 shadow-[0_10px_35px_rgba(0,0,0,0.03)] border border-gray-100/80">
                         
+                        @if (session('success'))
+                            <div class="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl flex items-center justify-between text-xs sm:text-sm">
+                                <div class="flex items-center gap-2.5">
+                                    <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    <span class="font-semibold">{{ session('success') }}</span>
+                                </div>
+                            </div>
+                        @endif
+
+                        @if (isset($errors) && $errors->any())
+                            <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-2xl text-xs sm:text-sm">
+                                <p class="font-bold mb-1">Periksa kembali data yang dimasukkan:</p>
+                                <ul class="list-disc list-inside space-y-0.5">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
+                        <!-- Status Tahapan Pendaftaran -->
+                        @if ($isBerkasDiterima)
+                            <div class="mb-7 p-4 sm:p-5 bg-emerald-50/80 border border-emerald-200 rounded-2xl flex items-start gap-3.5">
+                                <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <div class="text-xs sm:text-sm flex-1">
+                                    <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-200/60 text-emerald-800 mb-1">Tahap 2: Lolos Berkas (ACC Admin)</span>
+                                    <p class="font-bold text-emerald-950">Selamat! Berkas pendaftaran Anda telah disetujui (ACC) oleh Admin.</p>
+                                    <p class="text-emerald-800 mt-1 leading-relaxed">Menu <strong>Pengisian Jadwal Wawancara</strong> telah aktif di sidebar. Silakan tentukan sesi wawancara Anda.</p>
+                                    <div class="mt-3">
+                                        <button type="button" onclick="switchSection('wawancara')" class="inline-flex items-center gap-1.5 px-4 py-2 bg-[#004ADA] hover:bg-[#003bb0] text-white text-xs font-semibold rounded-xl shadow-xs transition-colors cursor-pointer">
+                                            <span>Buka Pengisian Jadwal Wawancara</span>
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        @elseif ($hasRegistered)
+                            <div class="mb-7 p-4 sm:p-5 bg-amber-50/80 border border-amber-200 rounded-2xl flex items-start gap-3.5">
+                                <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0 mt-0.5">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <div class="text-xs sm:text-sm flex-1">
+                                    <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-200/60 text-amber-800 mb-1">Tahap 1: Menunggu ACC Berkas Admin</span>
+                                    <p class="font-bold text-amber-950">Berkas pendaftaran Anda telah terkirim (Status: {{ $pendaftar->status ?? 'Mendaftar' }})</p>
+                                    <p class="text-amber-800 mt-1 leading-relaxed">Admin sedang meninjau berkas pendaftaran Anda. Bagian <strong>Pengisian Jadwal Wawancara</strong> akan otomatis muncul setelah berkas Anda disetujui (Lolos Berkas).</p>
+                                </div>
+                            </div>
+                        @else
+                            <div class="mb-7 p-4 sm:p-5 bg-blue-50/70 border border-blue-200/80 rounded-2xl flex items-start gap-3.5">
+                                <div class="w-9 h-9 rounded-xl bg-blue-100 text-[#004ADA] flex items-center justify-center shrink-0 mt-0.5">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <div class="text-xs sm:text-sm flex-1">
+                                    <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-200/60 text-[#004ADA] mb-1">Pendaftaran Baru</span>
+                                    <p class="font-bold text-[#1F1F1F]">Lengkapi Formulir Pendaftaran Oprec Staff KMID</p>
+                                    <p class="text-[#707070] mt-1 leading-relaxed">Silakan lengkapi data diri, pilihan divisi, dan berkas di bawah ini. Setelah berkas dikirim dan disetujui (ACC) oleh Admin, bagian <strong>Pengisian Jadwal Wawancara</strong> akan terbuka.</p>
+                                </div>
+                            </div>
+                        @endif
+
                         <!-- Form Header -->
                         <div class="mb-8">
                             <!-- Small Brand Tag -->
@@ -224,7 +298,7 @@
                         <hr class="border-[#F3F4F6] my-7">
 
                         <!-- Multi-step Form Content -->
-                        <form id="form-oprec" action="#" method="POST" enctype="multipart/form-data" onsubmit="event.preventDefault();">
+                        <form id="form-oprec" action="{{ route('open-recruitment.store') }}" method="POST" enctype="multipart/form-data">
                             @csrf
 
                             <!-- ========================================== -->
@@ -248,20 +322,20 @@
                                         <!-- Field 1: Nama Lengkap -->
                                         <div>
                                             <label for="nama_lengkap" class="block text-sm font-semibold text-[#1F1F1F] mb-2">1. Nama lengkap</label>
-                                            <input type="text" id="nama_lengkap" name="nama_lengkap" required placeholder="Masukkan nama lengkap" class="w-full px-4 py-3 bg-[#FBFBFA] border border-[#E5E7EB] rounded-xl text-sm text-[#1F1F1F] placeholder-[#9CA3AF] focus:outline-none focus:bg-white focus:border-[#004ADA] focus:ring-2 focus:ring-blue-100 transition-all">
+                                            <input type="text" id="nama_lengkap" name="nama_lengkap" value="{{ old('nama_lengkap', $pendaftar->name ?? auth()->user()->name) }}" required placeholder="Masukkan nama lengkap" class="w-full px-4 py-3 bg-[#FBFBFA] border border-[#E5E7EB] rounded-xl text-sm text-[#1F1F1F] placeholder-[#9CA3AF] focus:outline-none focus:bg-white focus:border-[#004ADA] focus:ring-2 focus:ring-blue-100 transition-all">
                                         </div>
 
                                         <!-- Field 2: NIM -->
                                         <div>
                                             <label for="nim" class="block text-sm font-semibold text-[#1F1F1F] mb-2">2. NIM</label>
-                                            <input type="text" id="nim" name="nim" required placeholder="Masukkan NIM" class="w-full px-4 py-3 bg-[#FBFBFA] border border-[#E5E7EB] rounded-xl text-sm text-[#1F1F1F] placeholder-[#9CA3AF] focus:outline-none focus:bg-white focus:border-[#004ADA] focus:ring-2 focus:ring-blue-100 transition-all">
+                                            <input type="text" id="nim" name="nim" value="{{ old('nim', $pendaftar->nim ?? '') }}" required placeholder="Format: 25/512345/SV/22345" class="w-full px-4 py-3 bg-[#FBFBFA] border border-[#E5E7EB] rounded-xl text-sm text-[#1F1F1F] placeholder-[#9CA3AF] focus:outline-none focus:bg-white focus:border-[#004ADA] focus:ring-2 focus:ring-blue-100 transition-all">
                                         </div>
                                     </div>
 
                                     <!-- Field 3: Asal Prodi -->
                                     <div>
                                         <label for="asal_prodi" class="block text-sm font-semibold text-[#1F1F1F] mb-2">3. Asal Prodi</label>
-                                        <input type="text" id="asal_prodi" name="asal_prodi" required placeholder="Masukkan program studi" class="w-full px-4 py-3 bg-[#FBFBFA] border border-[#E5E7EB] rounded-xl text-sm text-[#1F1F1F] placeholder-[#9CA3AF] focus:outline-none focus:bg-white focus:border-[#004ADA] focus:ring-2 focus:ring-blue-100 transition-all">
+                                        <input type="text" id="asal_prodi" name="asal_prodi" value="{{ old('asal_prodi', $pendaftar->major ?? '') }}" required placeholder="Contoh: Teknologi Rekayasa Perangkat Lunak" class="w-full px-4 py-3 bg-[#FBFBFA] border border-[#E5E7EB] rounded-xl text-sm text-[#1F1F1F] placeholder-[#9CA3AF] focus:outline-none focus:bg-white focus:border-[#004ADA] focus:ring-2 focus:ring-blue-100 transition-all">
                                     </div>
                                 </div>
 
@@ -312,13 +386,15 @@
                                                     'MicroTeaching Digital Pendidikan',
                                                     'Video Digital Pendidikan',
                                                 ];
+                                                $selectedDivisi = old('divisi_pertama', $pendaftar->division ?? 'Media Creative');
                                             @endphp
 
                                             @foreach($divisiList as $index => $divisi)
-                                                <label class="division-card relative flex items-center gap-3 px-4 py-3 bg-[#FBFBFA] border border-[#E5E7EB] rounded-xl cursor-pointer transition-all hover:bg-white select-none">
-                                                    <input type="radio" name="divisi_pertama" value="{{ $divisi }}" class="sr-only division-radio">
-                                                    <span class="custom-radio-circle w-4 h-4 rounded-full border border-gray-300 flex items-center justify-center shrink-0">
-                                                        <span class="radio-dot w-2 h-2 rounded-full bg-[#004ADA] hidden"></span>
+                                                @php $isDivSelected = ($selectedDivisi === $divisi); @endphp
+                                                <label class="division-card relative flex items-center gap-3 px-4 py-3 bg-[#FBFBFA] border {{ $isDivSelected ? 'border-[#004ADA] bg-blue-50/50' : 'border-[#E5E7EB]' }} rounded-xl cursor-pointer transition-all hover:bg-white select-none">
+                                                    <input type="radio" name="divisi_pertama" value="{{ $divisi }}" class="sr-only division-radio" {{ $isDivSelected ? 'checked' : '' }}>
+                                                    <span class="custom-radio-circle w-4 h-4 rounded-full border {{ $isDivSelected ? 'border-[#004ADA]' : 'border-gray-300' }} flex items-center justify-center shrink-0">
+                                                        <span class="radio-dot w-2 h-2 rounded-full bg-[#004ADA] {{ $isDivSelected ? '' : 'hidden' }}"></span>
                                                     </span>
                                                     <span class="text-xs sm:text-sm font-medium text-[#1F1F1F] division-text">{{ $divisi }}</span>
                                                 </label>
@@ -328,8 +404,8 @@
 
                                     <!-- Field 5: Alasan Memilih Divisi Pertama -->
                                     <div>
-                                        <label for="alasan_divisi_1" class="block text-sm font-semibold text-[#1F1F1F] mb-2">5. Alasan Memilih Divisi Pertama</label>
-                                        <textarea id="alasan_divisi_1" name="alasan_divisi_1" rows="3" placeholder="Ceritakan minat, pengalaman, dan alasanmu memilih divisi pertama." class="w-full px-4 py-3 bg-[#FBFBFA] border border-[#E5E7EB] rounded-xl text-sm text-[#1F1F1F] placeholder-[#9CA3AF] focus:outline-none focus:bg-white focus:border-[#004ADA] focus:ring-2 focus:ring-blue-100 transition-all resize-y"></textarea>
+                                        <label for="alasan_divisi_pertama" class="block text-sm font-semibold text-[#1F1F1F] mb-2">5. Alasan Memilih Divisi Pertama</label>
+                                        <textarea id="alasan_divisi_pertama" name="alasan_divisi_pertama" rows="3" placeholder="Ceritakan minat, pengalaman, dan alasanmu memilih divisi pertama." class="w-full px-4 py-3 bg-[#FBFBFA] border border-[#E5E7EB] rounded-xl text-sm text-[#1F1F1F] placeholder-[#9CA3AF] focus:outline-none focus:bg-white focus:border-[#004ADA] focus:ring-2 focus:ring-blue-100 transition-all resize-y">{{ old('alasan_divisi_pertama', $pendaftar->motivation ?? '') }}</textarea>
                                     </div>
 
                                     <!-- Field 6: Pilihan Kedua -->
@@ -435,7 +511,7 @@
                                     <!-- Field 10: Nomor WhatsApp -->
                                     <div>
                                         <label for="no_whatsapp" class="block text-sm font-semibold text-[#1F1F1F] mb-2">10. Nomor WhatsApp</label>
-                                        <input type="tel" id="no_whatsapp" name="no_whatsapp" required placeholder="Masukkan nomor WhatsApp" class="w-full px-4 py-3 bg-[#FBFBFA] border border-[#E5E7EB] rounded-xl text-sm text-[#1F1F1F] placeholder-[#9CA3AF] focus:outline-none focus:bg-white focus:border-[#004ADA] focus:ring-2 focus:ring-blue-100 transition-all">
+                                        <input type="tel" id="no_whatsapp" name="no_whatsapp" value="{{ old('no_whatsapp', $pendaftar->phone_number ?? '') }}" required placeholder="Contoh: 0812-3456-7890" class="w-full px-4 py-3 bg-[#FBFBFA] border border-[#E5E7EB] rounded-xl text-sm text-[#1F1F1F] placeholder-[#9CA3AF] focus:outline-none focus:bg-white focus:border-[#004ADA] focus:ring-2 focus:ring-blue-100 transition-all">
                                     </div>
                                 </div>
 
@@ -443,7 +519,7 @@
                                 <div class="mt-10 pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
                                     <p class="text-xs text-[#707070] text-center sm:text-left">Pastikan data dan berkasmu sudah sesuai sebelum mengirim pendaftaran.</p>
                                     
-                                    <button type="button" id="btn-submit-pendaftaran" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 bg-[#004ADA] hover:bg-[#003FBA] active:scale-[0.99] text-white font-semibold text-sm rounded-xl transition-all duration-200 shadow-md shadow-blue-600/20">
+                                    <button type="submit" id="btn-submit-pendaftaran" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 bg-[#004ADA] hover:bg-[#003FBA] active:scale-[0.99] text-white font-semibold text-sm rounded-xl transition-all duration-200 shadow-md shadow-blue-600/20 cursor-pointer">
                                         <span>Kirim Pendaftaran</span>
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
@@ -458,6 +534,7 @@
                 <!-- ============================================================== -->
                 <!-- SECTION 2: PENGISIAN JADWAL WAWANCARA                          -->
                 <!-- ============================================================== -->
+                @if($isBerkasDiterima)
                 <section id="section-wawancara" class="portal-section w-full max-w-[880px] relative z-10 hidden">
                     <div class="bg-white rounded-[24px] sm:rounded-[28px] p-6 sm:p-10 lg:p-12 shadow-[0_10px_35px_rgba(0,0,0,0.03)] border border-gray-100/80">
                         
@@ -480,99 +557,116 @@
                             <p class="text-xs sm:text-sm text-[#707070] leading-relaxed">Halo, calon anggota KMID! Tentukan Sesi Wawancaramu melalui formulir di bawah ini.</p>
                         </div>
 
-                        <!-- Divider line -->
-                        <hr class="border-[#F3F4F6] my-7">
-
-                        <!-- Data Pendaftar (Read-only) -->
-                        <div class="mb-8">
-                            <div class="flex items-center justify-between mb-4">
-                                <h2 class="text-base font-semibold text-[#1F1F1F]">Data pendaftar</h2>
-                                <span class="inline-flex items-center gap-1 text-xs text-[#9CA3AF] bg-gray-50 border border-gray-200 px-2.5 py-1 rounded-md">
-                                    <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                                    </svg>
-                                    <span>Read-only</span>
-                                </span>
+                        @if(!empty($pendaftar->interview_time))
+                            <div class="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-3">
+                                <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <div class="text-xs sm:text-sm text-emerald-950">
+                                    <p class="font-bold">Jadwal Wawancara Terkonfirmasi:</p>
+                                    <p class="text-emerald-800">{{ $pendaftar->interview_date ?? '8 - 10 Oktober 2026' }} · Sesi <strong>{{ $pendaftar->interview_time }} WIB</strong></p>
+                                </div>
                             </div>
+                        @endif
 
-                            <div class="space-y-4">
-                                <!-- 1. Nama Lengkap -->
-                                <div>
-                                    <label class="block text-sm font-semibold text-[#1F1F1F] mb-1.5">1. Nama Lengkap</label>
-                                    <input type="text" value="{{ auth()->user()->name ?? 'Ahmad Tariq Hifzhillah' }}" disabled readonly class="w-full px-4 py-3 bg-[#ECECEC] border border-transparent rounded-xl text-sm text-[#555555] font-medium cursor-not-allowed select-none">
+                        <form action="{{ route('open-recruitment.jadwal') }}" method="POST">
+                            @csrf
+
+                            <!-- Divider line -->
+                            <hr class="border-[#F3F4F6] my-7">
+
+                            <!-- Data Pendaftar (Read-only) -->
+                            <div class="mb-8">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h2 class="text-base font-semibold text-[#1F1F1F]">Data pendaftar</h2>
+                                    <span class="inline-flex items-center gap-1 text-xs text-[#9CA3AF] bg-gray-50 border border-gray-200 px-2.5 py-1 rounded-md">
+                                        <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                        </svg>
+                                        <span>Read-only</span>
+                                    </span>
                                 </div>
 
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <!-- 2. Divisi yang Lolos -->
+                                <div class="space-y-4">
+                                    <!-- 1. Nama Lengkap -->
                                     <div>
-                                        <label class="block text-sm font-semibold text-[#1F1F1F] mb-1.5">2. Divisi yang Lolos</label>
-                                        <input type="text" value="Media Creative" disabled readonly class="w-full px-4 py-3 bg-[#ECECEC] border border-transparent rounded-xl text-sm text-[#555555] font-medium cursor-not-allowed select-none">
+                                        <label class="block text-sm font-semibold text-[#1F1F1F] mb-1.5">1. Nama Lengkap</label>
+                                        <input type="text" value="{{ $pendaftar->name ?? auth()->user()->name }}" disabled readonly class="w-full px-4 py-3 bg-[#ECECEC] border border-transparent rounded-xl text-sm text-[#555555] font-medium cursor-not-allowed select-none">
                                     </div>
 
-                                    <!-- 3. Hari Wawancara -->
-                                    <div>
-                                        <label class="block text-sm font-semibold text-[#1F1F1F] mb-1.5">3. Hari Wawancara</label>
-                                        <input type="text" value="8 Oktober - 10 Oktober" disabled readonly class="w-full px-4 py-3 bg-[#ECECEC] border border-transparent rounded-xl text-sm text-[#555555] font-medium cursor-not-allowed select-none">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 4. Jam Wawancara -->
-                        <div class="pt-2">
-                            <div class="flex items-start gap-3 mb-4">
-                                <div class="w-7 h-7 rounded-full bg-amber-50 text-[#FEA515] flex items-center justify-center shrink-0 mt-0.5">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <h3 class="text-sm font-semibold text-[#1F1F1F]">4. Jam Wawancara</h3>
-                                    <p class="text-xs text-[#707070] mt-0.5">Pilih satu sesi wawancara. Durasi setiap sesi 15 menit.</p>
-                                </div>
-                            </div>
-
-                            <!-- 6 Sesi Jam Wawancara Cards -->
-                            @php
-                                $sesiList = [
-                                    ['time' => '10:00-10:15', 'duration' => '15 menit', 'checked' => false],
-                                    ['time' => '10:15-10:30', 'duration' => '15 menit', 'checked' => true],
-                                    ['time' => '10:30-10:45', 'duration' => '15 menit', 'checked' => false],
-                                    ['time' => '10:45-11:00', 'duration' => '15 menit', 'checked' => false],
-                                    ['time' => '11:00-11:15', 'duration' => '15 menit', 'checked' => false],
-                                    ['time' => '11:15-11:30', 'duration' => '15 menit', 'checked' => false],
-                                ];
-                            @endphp
-
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="group-sesi-wawancara">
-                                @foreach($sesiList as $sesi)
-                                    <label class="sesi-card relative flex items-center gap-3 px-4 py-3.5 rounded-xl cursor-pointer transition-all select-none border {{ $sesi['checked'] ? 'border-[#004ADA] bg-[#EBF2FE]' : 'border-[#E5E7EB] bg-[#FBFBFA] hover:bg-white' }}">
-                                        <input type="radio" name="jam_wawancara" value="{{ $sesi['time'] }}" class="sr-only sesi-radio" {{ $sesi['checked'] ? 'checked' : '' }}>
-                                        <span class="custom-radio-circle w-4 h-4 rounded-full border {{ $sesi['checked'] ? 'border-[#004ADA]' : 'border-gray-300' }} flex items-center justify-center shrink-0">
-                                            <span class="radio-dot w-2 h-2 rounded-full bg-[#004ADA] {{ $sesi['checked'] ? '' : 'hidden' }}"></span>
-                                        </span>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <!-- 2. Divisi yang Lolos -->
                                         <div>
-                                            <div class="text-xs sm:text-sm font-semibold {{ $sesi['checked'] ? 'text-[#004ADA]' : 'text-[#1F1F1F]' }} sesi-time">{{ $sesi['time'] }}</div>
-                                            <div class="text-[11px] text-[#9CA3AF]">{{ $sesi['duration'] }}</div>
+                                            <label class="block text-sm font-semibold text-[#1F1F1F] mb-1.5">2. Divisi yang Lolos</label>
+                                            <input type="text" value="{{ $pendaftar->division ?? 'Media Creative' }}" disabled readonly class="w-full px-4 py-3 bg-[#ECECEC] border border-transparent rounded-xl text-sm text-[#555555] font-medium cursor-not-allowed select-none">
                                         </div>
-                                    </label>
-                                @endforeach
-                            </div>
-                        </div>
 
-                        <!-- Footer Action with Note -->
-                        <div class="mt-10 pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-                            <p class="text-xs text-[#707070] text-center sm:text-left">Pastikan sesi yang dipilih sudah sesuai sebelum mengirim jadwal wawancara.</p>
-                            
-                            <button type="button" id="btn-submit-wawancara" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 bg-[#004ADA] hover:bg-[#003FBA] active:scale-[0.99] text-white font-semibold text-sm rounded-xl transition-all duration-200 shadow-md shadow-blue-600/20">
-                                <span>Kirim Jadwal Wawancara</span>
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                                </svg>
-                            </button>
-                        </div>
+                                        <!-- 3. Hari Wawancara -->
+                                        <div>
+                                            <label class="block text-sm font-semibold text-[#1F1F1F] mb-1.5">3. Hari Wawancara</label>
+                                            <input type="text" value="{{ $pendaftar->interview_date ?? '8 - 10 Oktober 2026' }}" disabled readonly class="w-full px-4 py-3 bg-[#ECECEC] border border-transparent rounded-xl text-sm text-[#555555] font-medium cursor-not-allowed select-none">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 4. Jam Wawancara -->
+                            <div class="pt-2">
+                                <div class="flex items-start gap-3 mb-4">
+                                    <div class="w-7 h-7 rounded-full bg-amber-50 text-[#FEA515] flex items-center justify-center shrink-0 mt-0.5">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-sm font-semibold text-[#1F1F1F]">4. Jam Wawancara</h3>
+                                        <p class="text-xs text-[#707070] mt-0.5">Pilih satu sesi wawancara. Durasi setiap sesi 15 menit.</p>
+                                    </div>
+                                </div>
+
+                                <!-- 6 Sesi Jam Wawancara Cards -->
+                                @php
+                                    $currentSesi = $pendaftar->interview_time ?? '10:15-10:30';
+                                    $sesiList = [
+                                        ['time' => '10:00-10:15', 'duration' => '15 menit'],
+                                        ['time' => '10:15-10:30', 'duration' => '15 menit'],
+                                        ['time' => '10:30-10:45', 'duration' => '15 menit'],
+                                        ['time' => '10:45-11:00', 'duration' => '15 menit'],
+                                        ['time' => '11:00-11:15', 'duration' => '15 menit'],
+                                        ['time' => '11:15-11:30', 'duration' => '15 menit'],
+                                    ];
+                                @endphp
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="group-sesi-wawancara">
+                                    @foreach($sesiList as $sesi)
+                                        @php $isSelected = ($currentSesi === $sesi['time']); @endphp
+                                        <label class="sesi-card relative flex items-center gap-3 px-4 py-3.5 rounded-xl cursor-pointer transition-all select-none border {{ $isSelected ? 'border-[#004ADA] bg-[#EBF2FE]' : 'border-[#E5E7EB] bg-[#FBFBFA] hover:bg-white' }}">
+                                            <input type="radio" name="jam_wawancara" value="{{ $sesi['time'] }}" class="sr-only sesi-radio" {{ $isSelected ? 'checked' : '' }}>
+                                            <span class="custom-radio-circle w-4 h-4 rounded-full border {{ $isSelected ? 'border-[#004ADA]' : 'border-gray-300' }} flex items-center justify-center shrink-0">
+                                                <span class="radio-dot w-2 h-2 rounded-full bg-[#004ADA] {{ $isSelected ? '' : 'hidden' }}"></span>
+                                            </span>
+                                            <div>
+                                                <div class="text-xs sm:text-sm font-semibold {{ $isSelected ? 'text-[#004ADA]' : 'text-[#1F1F1F]' }} sesi-time">{{ $sesi['time'] }}</div>
+                                                <div class="text-[11px] text-[#9CA3AF]">{{ $sesi['duration'] }}</div>
+                                            </div>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <!-- Footer Action with Note -->
+                            <div class="mt-10 pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                <p class="text-xs text-[#707070] text-center sm:text-left">Pastikan sesi yang dipilih sudah sesuai sebelum mengirim jadwal wawancara.</p>
+                                
+                                <button type="submit" id="btn-submit-wawancara" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 bg-[#004ADA] hover:bg-[#003FBA] active:scale-[0.99] text-white font-semibold text-sm rounded-xl transition-all duration-200 shadow-md shadow-blue-600/20 cursor-pointer">
+                                    <span>Konfirmasi Jadwal Wawancara</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </section>
+                @endif
 
             </main>
         </div>
@@ -589,38 +683,44 @@
             const sectionPendaftaran = document.getElementById('section-pendaftaran');
             const sectionWawancara = document.getElementById('section-wawancara');
 
-            function switchSection(target) {
-                if (target === 'wawancara') {
-                    // Update Sidebar Buttons
+            window.switchSection = function(target) {
+                if (target === 'wawancara' && navBtnWawancara && sectionWawancara) {
                     navBtnWawancara.classList.remove('text-[#707070]', 'hover:bg-slate-50', 'hover:text-[#1F1F1F]');
                     navBtnWawancara.classList.add('bg-[#EBF2FE]', 'text-[#004ADA]');
-                    navBtnWawancara.querySelector('.indicator-bar').classList.remove('hidden');
+                    navBtnWawancara.querySelector('.indicator-bar')?.classList.remove('hidden');
 
-                    navBtnPendaftaran.classList.remove('bg-[#EBF2FE]', 'text-[#004ADA]');
-                    navBtnPendaftaran.classList.add('text-[#707070]', 'hover:bg-slate-50', 'hover:text-[#1F1F1F]');
-                    navBtnPendaftaran.querySelector('.indicator-bar').classList.add('hidden');
+                    if (navBtnPendaftaran) {
+                        navBtnPendaftaran.classList.remove('bg-[#EBF2FE]', 'text-[#004ADA]');
+                        navBtnPendaftaran.classList.add('text-[#707070]', 'hover:bg-slate-50', 'hover:text-[#1F1F1F]');
+                        navBtnPendaftaran.querySelector('.indicator-bar')?.classList.add('hidden');
+                    }
 
-                    // Show Wawancara Section
-                    sectionPendaftaran.classList.add('hidden');
+                    if (sectionPendaftaran) sectionPendaftaran.classList.add('hidden');
                     sectionWawancara.classList.remove('hidden');
-                } else {
-                    // Update Sidebar Buttons
-                    navBtnPendaftaran.classList.remove('text-[#707070]', 'hover:bg-slate-50', 'hover:text-[#1F1F1F]');
-                    navBtnPendaftaran.classList.add('bg-[#EBF2FE]', 'text-[#004ADA]');
-                    navBtnPendaftaran.querySelector('.indicator-bar').classList.remove('hidden');
+                } else if (sectionPendaftaran) {
+                    if (navBtnPendaftaran) {
+                        navBtnPendaftaran.classList.remove('text-[#707070]', 'hover:bg-slate-50', 'hover:text-[#1F1F1F]');
+                        navBtnPendaftaran.classList.add('bg-[#EBF2FE]', 'text-[#004ADA]');
+                        navBtnPendaftaran.querySelector('.indicator-bar')?.classList.remove('hidden');
+                    }
 
-                    navBtnWawancara.classList.remove('bg-[#EBF2FE]', 'text-[#004ADA]');
-                    navBtnWawancara.classList.add('text-[#707070]', 'hover:bg-slate-50', 'hover:text-[#1F1F1F]');
-                    navBtnWawancara.querySelector('.indicator-bar').classList.add('hidden');
+                    if (navBtnWawancara) {
+                        navBtnWawancara.classList.remove('bg-[#EBF2FE]', 'text-[#004ADA]');
+                        navBtnWawancara.classList.add('text-[#707070]', 'hover:bg-slate-50', 'hover:text-[#1F1F1F]');
+                        navBtnWawancara.querySelector('.indicator-bar')?.classList.add('hidden');
+                    }
 
-                    // Show Pendaftaran Section
-                    sectionWawancara.classList.add('hidden');
+                    if (sectionWawancara) sectionWawancara.classList.add('hidden');
                     sectionPendaftaran.classList.remove('hidden');
                 }
-            }
+            };
 
-            navBtnPendaftaran.addEventListener('click', () => switchSection('pendaftaran'));
-            navBtnWawancara.addEventListener('click', () => switchSection('wawancara'));
+            if (navBtnPendaftaran) {
+                navBtnPendaftaran.addEventListener('click', () => window.switchSection('pendaftaran'));
+            }
+            if (navBtnWawancara) {
+                navBtnWawancara.addEventListener('click', () => window.switchSection('wawancara'));
+            }
 
             // Step Elements
             const stepA = document.getElementById('step-a');
@@ -629,15 +729,15 @@
 
             // Check URL Params
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('tab') === 'wawancara') {
-                switchSection('wawancara');
+            if (urlParams.get('tab') === 'wawancara' && navBtnWawancara) {
+                window.switchSection('wawancara');
             } else if (urlParams.get('step') === 'b') {
-                stepA.classList.add('hidden');
-                stepB.classList.remove('hidden');
+                stepA?.classList.add('hidden');
+                stepB?.classList.remove('hidden');
             } else if (urlParams.get('step') === 'c') {
-                stepA.classList.add('hidden');
-                stepB.classList.add('hidden');
-                stepC.classList.remove('hidden');
+                stepA?.classList.add('hidden');
+                stepB?.classList.add('hidden');
+                stepC?.classList.remove('hidden');
             }
 
             // Mobile Sidebar Drawer Toggle
@@ -664,43 +764,41 @@
             const btnBackToA = document.getElementById('btn-back-to-a');
             const btnNextToC = document.getElementById('btn-next-to-c');
             const btnBackToB = document.getElementById('btn-back-to-b');
-            const btnSubmitPendaftaran = document.getElementById('btn-submit-pendaftaran');
 
             btnNextToB?.addEventListener('click', () => {
-                stepA.classList.add('hidden');
-                stepB.classList.remove('hidden');
+                const nama = document.getElementById('nama_lengkap')?.value.trim();
+                const nim = document.getElementById('nim')?.value.trim();
+                const prodi = document.getElementById('asal_prodi')?.value.trim();
+                if (!nama || !nim || !prodi) {
+                    alert('Mohon lengkapi Nama Lengkap, NIM, dan Asal Prodi terlebih dahulu.');
+                    return;
+                }
+                stepA?.classList.add('hidden');
+                stepB?.classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
 
             btnBackToA?.addEventListener('click', () => {
-                stepB.classList.add('hidden');
-                stepA.classList.remove('hidden');
+                stepB?.classList.add('hidden');
+                stepA?.classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
 
             btnNextToC?.addEventListener('click', () => {
-                stepB.classList.add('hidden');
-                stepC.classList.remove('hidden');
+                const divisi = document.querySelector('input[name="divisi_pertama"]:checked');
+                if (!divisi) {
+                    alert('Mohon pilih salah satu Divisi Pertama.');
+                    return;
+                }
+                stepB?.classList.add('hidden');
+                stepC?.classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
 
             btnBackToB?.addEventListener('click', () => {
-                stepC.classList.add('hidden');
-                stepB.classList.remove('hidden');
+                stepC?.classList.add('hidden');
+                stepB?.classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-
-            btnSubmitPendaftaran.addEventListener('click', () => {
-                // Smooth celebration feedback and switch to Jadwal Wawancara tab
-                alert('Pendaftaran Oprec KMID berhasil dikirim! Silakan tentukan sesi wawancaramu.');
-                switchSection('wawancara');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-
-            const btnSubmitWawancara = document.getElementById('btn-submit-wawancara');
-            btnSubmitWawancara.addEventListener('click', () => {
-                const selectedSesi = document.querySelector('input[name="jam_wawancara"]:checked')?.value || '10:15-10:30';
-                alert('Jadwal wawancara berhasil dikonfirmasi untuk sesi ' + selectedSesi + '. Informasi detail akan dikirimkan ke WhatsApp Anda.');
             });
 
             // Division Selection Cards Style Sync

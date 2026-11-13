@@ -133,8 +133,92 @@ Route::get('/open-recruitment', function () {
         ]);
     }
 
-    return view('open-recruitment');
+    $user = Auth::user();
+    $pendaftar = \App\Models\Pendaftar::where('email', $user->email)->first();
+
+    return view('open-recruitment', compact('pendaftar'));
 })->name('open-recruitment');
+
+Route::post('/open-recruitment', function (Request $request) {
+    if (!Auth::check()) {
+        return redirect()->route('login');
+    }
+
+    $validated = $request->validate([
+        'nama_lengkap' => ['required', 'string', 'max:150'],
+        'nim' => ['required', 'string', 'max:50'],
+        'asal_prodi' => ['required', 'string', 'max:100'],
+        'divisi_pertama' => ['required', 'string', 'max:100'],
+        'alasan_divisi_pertama' => ['nullable', 'string'],
+        'no_whatsapp' => ['nullable', 'string', 'max:30'],
+        'file_cv' => ['nullable', 'file', 'mimes:pdf,doc,docx', 'max:5120'],
+        'file_porto' => ['nullable', 'file', 'mimes:pdf,zip,rar', 'max:10240'],
+    ], [
+        'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
+        'nim.required' => 'NIM wajib diisi.',
+        'asal_prodi.required' => 'Asal program studi wajib diisi.',
+        'divisi_pertama.required' => 'Pilihan divisi pertama wajib dipilih.',
+    ]);
+
+    $user = Auth::user();
+    $cvPath = null;
+    if ($request->hasFile('file_cv') && $request->file('file_cv')->isValid()) {
+        $file = $request->file('file_cv');
+        $filename = 'cv_' . time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '', $file->getClientOriginalName());
+        $destination = public_path('uploads/cv');
+        if (!file_exists($destination)) {
+            mkdir($destination, 0755, true);
+        }
+        $file->move($destination, $filename);
+        $cvPath = 'uploads/cv/' . $filename;
+    }
+
+    $data = [
+        'name' => $validated['nama_lengkap'],
+        'nim' => $validated['nim'],
+        'major' => $validated['asal_prodi'],
+        'division' => $validated['divisi_pertama'],
+        'motivation' => $validated['alasan_divisi_pertama'] ?? null,
+        'phone_number' => $validated['no_whatsapp'] ?? null,
+    ];
+    if ($cvPath) {
+        $data['cv_url'] = $cvPath;
+    }
+
+    $existing = \App\Models\Pendaftar::where('email', $user->email)->first();
+    if ($existing) {
+        $existing->update($data);
+    } else {
+        $data['email'] = $user->email;
+        $data['status'] = 'Mendaftar';
+        \App\Models\Pendaftar::create($data);
+    }
+
+    return redirect()->route('open-recruitment')->with('success', 'Pendaftaran Oprec KMID berhasil dikirim! Berkas Anda sedang menunggu peninjauan dan persetujuan dari Admin.');
+})->name('open-recruitment.store');
+
+Route::post('/open-recruitment/jadwal-wawancara', function (Request $request) {
+    if (!Auth::check()) {
+        return redirect()->route('login');
+    }
+
+    $request->validate([
+        'jam_wawancara' => ['required', 'string'],
+    ], [
+        'jam_wawancara.required' => 'Silakan pilih salah satu sesi jam wawancara.',
+    ]);
+
+    $user = Auth::user();
+    $pendaftar = \App\Models\Pendaftar::where('email', $user->email)->first();
+    if ($pendaftar) {
+        $pendaftar->update([
+            'interview_date' => '8 - 10 Oktober 2026',
+            'interview_time' => $request->jam_wawancara,
+        ]);
+    }
+
+    return redirect()->route('open-recruitment', ['tab' => 'wawancara'])->with('success', 'Jadwal wawancara berhasil dikonfirmasi untuk sesi ' . $request->jam_wawancara . '!');
+})->name('open-recruitment.jadwal');
 
 Route::get('/oprec', function () {
     return redirect()->route('open-recruitment');
