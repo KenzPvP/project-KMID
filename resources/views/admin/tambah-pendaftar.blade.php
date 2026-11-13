@@ -181,8 +181,8 @@
                     </label>
                     <div class="relative">
                         <select id="role" name="role" required class="w-full appearance-none bg-white border @error('role') border-red-400 @else border-gray-200 @enderror rounded-xl px-4 py-2.5 pr-8 text-xs sm:text-sm text-[#1F1F1F] focus:outline-none focus:border-[#004ADA] cursor-pointer">
-                            <option value="pendaftar" {{ old('role', 'pendaftar') === 'pendaftar' ? 'selected' : '' }}>Pendaftar (Oprec KMID)</option>
-                            <option value="staff" {{ old('role') === 'staff' ? 'selected' : '' }}>Staff (Akses Kelola Pendaftaran)</option>
+                            <option value="pendaftar" {{ old('role', request('role', 'pendaftar')) === 'pendaftar' ? 'selected' : '' }}>Pendaftar (Oprec KMID)</option>
+                            <option value="staff" {{ old('role', request('role', 'pendaftar')) === 'staff' ? 'selected' : '' }}>Staff (Akses Dashboard Pengelolaan)</option>
                         </select>
                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -190,7 +190,7 @@
                             </svg>
                         </div>
                     </div>
-                    <p class="text-[11px] text-[#8E8E93] mt-1">Pilih "Staff" agar akun dapat login ke dashboard pengelolaan.</p>
+                    <p class="text-[11px] text-[#8E8E93] mt-1">Pilih "Staff" agar saat akun login langsung diarahkan ke <strong>Dashboard Staff</strong>.</p>
                     @error('role')
                         <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p>
                     @enderror

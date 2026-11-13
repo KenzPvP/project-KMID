@@ -225,20 +225,43 @@
                 </div>
 
                 <!-- Akses Akun Login Staff -->
-                <div class="col-span-1 sm:col-span-2 pt-2 border-t border-gray-100">
-                    <label for="password" class="block text-xs font-semibold text-[#1F1F1F] mb-1.5">
-                        Beri akses login Staff (Opsional)
-                    </label>
-                    <input type="text" 
-                           id="password" 
-                           name="password" 
-                           value="{{ old('password') }}" 
-                           placeholder="Masukkan kata sandi jika pengurus ini diberi akses login Staff (min. 8 karakter)" 
-                           class="w-full px-4 py-2.5 bg-white border @error('password') border-red-400 @else border-gray-200 @enderror rounded-xl text-xs sm:text-sm text-[#1F1F1F] focus:outline-none focus:border-[#004ADA] focus:ring-1 focus:ring-[#004ADA]">
-                    <p class="text-[11px] text-[#8E8E93] mt-1">Jika diisi dan memiliki email UGM, sistem otomatis membuat akun dengan peran Staff agar pengurus dapat login ke dashboard pengelolaan.</p>
-                    @error('password')
-                        <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p>
-                    @enderror
+                <div class="col-span-1 sm:col-span-2 pt-4 pb-2 border-t border-gray-100">
+                    <div class="flex items-start gap-3 p-4 bg-blue-50/70 rounded-2xl border border-blue-100/90 mb-4">
+                        <div class="pt-0.5">
+                            <input type="checkbox" 
+                                   id="give_staff_access" 
+                                   name="give_staff_access" 
+                                   value="1" 
+                                   {{ old('give_staff_access', '1') == '1' ? 'checked' : '' }}
+                                   class="w-4 h-4 text-[#004ADA] rounded border-gray-300 focus:ring-[#004ADA] cursor-pointer">
+                        </div>
+                        <div>
+                            <label for="give_staff_access" class="text-xs sm:text-sm font-bold text-[#1F1F1F] cursor-pointer">
+                                Buat Akun Login Staff untuk Pengurus Ini
+                            </label>
+                            <p class="text-[11px] text-[#707070] mt-0.5 leading-relaxed">
+                                Akun otomatis diberi hak akses peran <strong>Staff</strong>. Ketika login menggunakan email UGM di halaman login, sistem langsung mengarahkannya ke <strong>Dashboard Staff</strong>.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="password" class="block text-xs font-semibold text-[#1F1F1F] mb-1.5">
+                            Kata sandi akun staff (Password)
+                        </label>
+                        <input type="text" 
+                               id="password" 
+                               name="password" 
+                               value="{{ old('password') }}" 
+                               placeholder="Kosongkan untuk otomatis menggunakan default: password123" 
+                               class="w-full px-4 py-2.5 bg-white border @error('password') border-red-400 @else border-gray-200 @enderror rounded-xl text-xs sm:text-sm text-[#1F1F1F] focus:outline-none focus:border-[#004ADA] focus:ring-1 focus:ring-[#004ADA]">
+                        <p class="text-[11px] text-[#8E8E93] mt-1">
+                            Minimal 8 karakter. Jika dikosongkan, kata sandi login default adalah: <strong class="text-[#004ADA]">password123</strong>
+                        </p>
+                        @error('password')
+                            <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
             </div>
 

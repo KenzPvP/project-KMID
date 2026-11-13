@@ -45,9 +45,25 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 17L17 7M17 7H7M17 7V17"/>
                         </svg>
                     </a>
-                    <a href="{{ route('login') }}" class="inline-flex items-center justify-center px-8 py-3.5 bg-[#FEA515] text-white font-semibold text-sm sm:text-base rounded-xl transition-all duration-300 hover:bg-[#EE9401] hover:shadow-xl hover:shadow-orange-500/30 hover:-translate-y-0.5 active:translate-y-0">
-                        Join KMID
-                    </a>
+                    @auth
+                        @if(auth()->user()->role === 'admin')
+                            <a href="{{ route('admin.pendaftar.index') }}" class="inline-flex items-center justify-center px-8 py-3.5 bg-[#004ADA] text-white font-semibold text-sm sm:text-base rounded-xl transition-all duration-300 hover:bg-[#003bb0] hover:shadow-xl hover:shadow-blue-500/30 hover:-translate-y-0.5 active:translate-y-0">
+                                Dashboard Admin
+                            </a>
+                        @elseif(auth()->user()->role === 'staff')
+                            <a href="{{ route('staff.pendaftar.index') }}" class="inline-flex items-center justify-center px-8 py-3.5 bg-[#FEA515] text-white font-semibold text-sm sm:text-base rounded-xl transition-all duration-300 hover:bg-[#EE9401] hover:shadow-xl hover:shadow-orange-500/30 hover:-translate-y-0.5 active:translate-y-0">
+                                Dashboard Staff
+                            </a>
+                        @else
+                            <a href="{{ route('login') }}" class="inline-flex items-center justify-center px-8 py-3.5 bg-[#FEA515] text-white font-semibold text-sm sm:text-base rounded-xl transition-all duration-300 hover:bg-[#EE9401] hover:shadow-xl hover:shadow-orange-500/30 hover:-translate-y-0.5 active:translate-y-0">
+                                Join KMID
+                            </a>
+                        @endif
+                    @else
+                        <a href="{{ route('login') }}" class="inline-flex items-center justify-center px-8 py-3.5 bg-[#FEA515] text-white font-semibold text-sm sm:text-base rounded-xl transition-all duration-300 hover:bg-[#EE9401] hover:shadow-xl hover:shadow-orange-500/30 hover:-translate-y-0.5 active:translate-y-0">
+                            Join KMID
+                        </a>
+                    @endauth
                 </div>
             </div>
         </section>

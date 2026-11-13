@@ -224,6 +224,56 @@
                         <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
+
+                <!-- Akses Akun Login Staff -->
+                <div class="col-span-1 sm:col-span-2 pt-4 pb-2 border-t border-gray-100">
+                    <div class="flex items-start gap-3 p-4 {{ ($userAccount && $userAccount->role === 'staff') ? 'bg-emerald-50/70 border-emerald-100/90' : 'bg-blue-50/70 border-blue-100/90' }} rounded-2xl border mb-4">
+                        <div class="pt-0.5">
+                            <input type="checkbox" 
+                                   id="give_staff_access" 
+                                   name="give_staff_access" 
+                                   value="1" 
+                                   {{ old('give_staff_access', ($userAccount && $userAccount->role === 'staff') ? '1' : '1') == '1' ? 'checked' : '' }}
+                                   class="w-4 h-4 text-[#004ADA] rounded border-gray-300 focus:ring-[#004ADA] cursor-pointer">
+                        </div>
+                        <div>
+                            <label for="give_staff_access" class="text-xs sm:text-sm font-bold text-[#1F1F1F] cursor-pointer">
+                                Berikan / Sinkronkan Hak Akses Login Staff (Role: Staff)
+                            </label>
+                            <p class="text-[11px] text-[#707070] mt-0.5 leading-relaxed">
+                                @if($userAccount && $userAccount->role === 'staff')
+                                    <span class="inline-flex items-center gap-1 font-semibold text-emerald-700">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                        Akun telah aktif sebagai Staff (Role: staff).
+                                    </span>
+                                @elseif($userAccount)
+                                    <span class="text-amber-700 font-semibold">Akun saat ini terdaftar dengan peran: {{ $userAccount->role }}. Centang untuk mengubahnya menjadi Staff.</span>
+                                @else
+                                    <span>Pengurus ini belum memiliki akun user login. Centang untuk otomatis membuatkan akun Staff.</span>
+                                @endif
+                                Ketika login di halaman login, akun ini otomatis langsung diarahkan ke <strong>Dashboard Staff</strong>.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="password" class="block text-xs font-semibold text-[#1F1F1F] mb-1.5">
+                            Ganti kata sandi login staff (Opsional)
+                        </label>
+                        <input type="text" 
+                               id="password" 
+                               name="password" 
+                               value="{{ old('password') }}" 
+                               placeholder="Kosongkan jika tidak ingin mengubah kata sandi" 
+                               class="w-full px-4 py-2.5 bg-white border @error('password') border-red-400 @else border-gray-200 @enderror rounded-xl text-xs sm:text-sm text-[#1F1F1F] focus:outline-none focus:border-[#004ADA] focus:ring-1 focus:ring-[#004ADA]">
+                        <p class="text-[11px] text-[#8E8E93] mt-1">
+                            Minimal 8 karakter. Kosongkan jika ingin mempertahankan kata sandi saat ini (atau default ke <strong class="text-[#004ADA]">password123</strong> untuk akun baru).
+                        </p>
+                        @error('password')
+                            <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
             </div>
 
             <!-- Upload / Ganti Foto Pengurus -->

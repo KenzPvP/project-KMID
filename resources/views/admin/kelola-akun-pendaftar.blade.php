@@ -115,8 +115,13 @@
             <div>
                 <h2 class="text-lg sm:text-xl font-bold text-[#1F1F1F]">Daftar pendaftar</h2>
             </div>
-            <div class="flex items-center gap-3">
-                <span class="text-xs sm:text-sm text-[#707070]">{{ count($pendaftars) }} pendaftar</span>
+            <div class="flex items-center gap-2 sm:gap-3">
+                <span class="text-xs sm:text-sm text-[#707070] hidden sm:inline">{{ count($pendaftars) }} pendaftar</span>
+                @if(!$isStaff)
+                <a href="{{ route($routePrefix . 'create', ['role' => 'staff']) }}" class="inline-flex items-center justify-center bg-amber-500 hover:bg-amber-600 text-white font-medium text-xs sm:text-sm px-3.5 py-2 rounded-xl shadow-[0_4px_14px_rgba(245,158,11,0.25)] transition-all duration-200">
+                    + Tambah Staff
+                </a>
+                @endif
                 <a href="{{ route($routePrefix . 'create') }}" class="inline-flex items-center justify-center bg-[#004ADA] hover:bg-[#003bb0] text-white font-medium text-xs sm:text-sm px-4 py-2 rounded-xl shadow-[0_4px_14px_rgba(0,74,218,0.25)] transition-all duration-200">
                     + Tambah Pendaftar
                 </a>
