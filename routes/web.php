@@ -1,8 +1,5 @@
 <?php
 
-use App\Http\Controllers\AdminDashboardController;
-use App\Http\Controllers\OprecDashboardController;
-use App\Http\Controllers\StaffDashboardController;
 use App\Models\User;
 use App\Rules\UgmEmail;
 use Illuminate\Http\Request;
@@ -29,13 +26,14 @@ Route::get('/information', function () {
     return view('information');
 })->name('information');
 
+// Route Penengah Dashboard berdasarkan Role
 Route::get('/dashboard', function () {
     $user = Auth::user();
 
     return match ($user?->role) {
-        'admin' => redirect()->route('admin.dashboard'),
-        'staff' => redirect()->route('staff.dashboard'),
-        default => redirect()->route('oprec.dashboard'),
+        'admin' => redirect()->route('admin.pendaftar.index'),
+        'staff' => redirect()->route('staff.pendaftar.index'),
+        default => redirect()->route('oprec'),
     };
 })->middleware('auth')->name('dashboard');
 
@@ -59,9 +57,9 @@ Route::post('/login', function (Request $request) {
         $user = Auth::user();
 
         return match ($user->role) {
-            'admin' => redirect()->route('admin.dashboard'),
-            'staff' => redirect()->route('staff.dashboard'),
-            default => redirect()->route('oprec.dashboard'),
+            'admin' => redirect()->route('admin.pendaftar.index'),
+            'staff' => redirect()->route('staff.pendaftar.index'),
+            default => redirect()->route('oprec'),
         };
     }
 
@@ -96,7 +94,7 @@ Route::post('/register', function (Request $request) {
     Auth::login($user);
     $request->session()->regenerate();
 
-    return redirect()->route('oprec.dashboard');
+    return redirect()->route('oprec');
 });
 
 Route::post('/logout', function (Request $request) {
@@ -107,6 +105,7 @@ Route::post('/logout', function (Request $request) {
     return redirect()->route('login');
 })->name('logout');
 
+// Portal Pendaftar / Open Recruitment Asli
 Route::get('/open-recruitment', function () {
     return view('open-recruitment');
 })->name('open-recruitment');
@@ -115,13 +114,25 @@ Route::get('/oprec', function () {
     return view('open-recruitment');
 })->name('oprec');
 
-// Route Group: Role Admin
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-
+Route::prefix('oprec')->name('oprec.')->middleware(['auth', 'role:pendaftar'])->group(function () {
     Route::get('/', function () {
-        return redirect()->route('admin.dashboard');
+        return view('open-recruitment');
     })->name('index');
+
+    Route::get('/dashboard', function () {
+        return view('open-recruitment');
+    })->name('dashboard');
+});
+
+// Route Group: Role Admin (Dashboard asli: Kelola Akun Pendaftar & Konten)
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/', function () {
+        return redirect()->route('admin.pendaftar.index');
+    })->name('index');
+
+    Route::get('/dashboard', function () {
+        return redirect()->route('admin.pendaftar.index');
+    })->name('dashboard');
 
     Route::get('/kelola-akun', function () {
         return view('admin.kelola-akun-pendaftar');
@@ -172,13 +183,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     })->name('persyaratan-guidebook');
 });
 
-// Route Group: Role Staff / Manager
+// Route Group: Role Staff / Manager (Dashboard asli: Kelola Akun Pendaftar Staff)
 Route::prefix('staff')->name('staff.')->middleware(['auth', 'role:staff'])->group(function () {
-    Route::get('/dashboard', [StaffDashboardController::class, 'index'])->name('dashboard');
-
     Route::get('/', function () {
-        return redirect()->route('staff.dashboard');
+        return redirect()->route('staff.pendaftar.index');
     })->name('index');
+
+    Route::get('/dashboard', function () {
+        return redirect()->route('staff.pendaftar.index');
+    })->name('dashboard');
 
     Route::get('/kelola-akun', function () {
         return view('admin.kelola-akun-pendaftar');
@@ -203,13 +216,4 @@ Route::prefix('staff')->name('staff.')->middleware(['auth', 'role:staff'])->grou
     Route::get('/pengaturan-pendaftaran', function () {
         return view('admin.pengaturan-pendaftaran');
     })->name('pendaftar.pengaturan');
-});
-
-// Route Group: Role Pendaftar
-Route::prefix('oprec')->name('oprec.')->middleware(['auth', 'role:pendaftar'])->group(function () {
-    Route::get('/dashboard', [OprecDashboardController::class, 'index'])->name('dashboard');
-
-    Route::get('/', function () {
-        return redirect()->route('oprec.dashboard');
-    })->name('index');
 });
