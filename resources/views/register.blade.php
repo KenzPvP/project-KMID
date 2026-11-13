@@ -56,13 +56,24 @@
                         <h2 class="text-2xl sm:text-3xl font-bold text-[#1F1F1F] tracking-tight">Buat akun KMID</h2>
                         <p class="text-xs sm:text-sm text-[#707070] mt-1.5 mb-6 font-normal">Isi informasi berikut untuk membuat akun baru.</p>
 
+                        @if ($errors->any())
+                            <div class="mb-5 p-3.5 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2.5 text-red-700 text-xs sm:text-sm font-medium">
+                                <svg class="w-5 h-5 text-red-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <div class="space-y-1">
+                                    @foreach ($errors->all() as $error)
+                                        <p>{{ $error }}</p>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+
                         <form action="{{ route('register') }}" method="POST" class="space-y-4">
                             @csrf
                             
                             <!-- Nama Lengkap Field -->
                             <div>
                                 <label for="name" class="block text-sm font-medium text-[#1F1F1F] mb-1.5">Nama Lengkap</label>
-                                <input type="text" id="name" name="name" required placeholder="Masukkan nama lengkap kamu" class="w-full px-4 py-3 bg-white border border-[#E2E8F0] rounded-xl text-sm text-[#1F1F1F] placeholder-[#9CA3AF] focus:outline-none focus:border-[#004ADA] focus:ring-2 focus:ring-blue-500/20 transition-all">
+                                <input type="text" id="name" name="name" value="{{ old('name') }}" required placeholder="Masukkan nama lengkap kamu" class="w-full px-4 py-3 bg-white border border-[#E2E8F0] rounded-xl text-sm text-[#1F1F1F] placeholder-[#9CA3AF] focus:outline-none focus:border-[#004ADA] focus:ring-2 focus:ring-blue-500/20 transition-all">
                             </div>
 
                             <!-- Email Field -->
@@ -74,8 +85,14 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                         </svg>
                                     </div>
-                                    <input type="email" id="email" name="email" required placeholder="Masukkan email kamu" class="w-full pl-11 pr-4 py-3 bg-white border border-[#E2E8F0] rounded-xl text-sm text-[#1F1F1F] placeholder-[#9CA3AF] focus:outline-none focus:border-[#004ADA] focus:ring-2 focus:ring-blue-500/20 transition-all">
+                                    <input type="email" id="email" name="email" value="{{ old('email') }}" required placeholder="nama@mail.ugm.ac.id" class="w-full pl-11 pr-4 py-3 bg-white border @error('email') border-red-500 focus:border-red-500 focus:ring-red-500/20 @else border-[#E2E8F0] focus:border-[#004ADA] focus:ring-blue-500/20 @enderror rounded-xl text-sm text-[#1F1F1F] placeholder-[#9CA3AF] focus:outline-none focus:ring-2 transition-all">
                                 </div>
+                                @error('email')
+                                    <p class="text-xs text-red-600 mt-1.5 font-medium flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        <span>{{ $message }}</span>
+                                    </p>
+                                @enderror
                             </div>
 
                             <!-- Kata Sandi Field -->
@@ -151,6 +168,21 @@
 
             setupPasswordToggle('toggle-password', 'password', 'eye-icon');
             setupPasswordToggle('toggle-password-confirm', 'password_confirmation', 'eye-icon-confirm');
+
+            const emailInput = document.getElementById('email');
+            function validateUgmEmail() {
+                const val = (emailInput.value || '').trim();
+                if (val && !val.toLowerCase().endsWith('@mail.ugm.ac.id')) {
+                    emailInput.setCustomValidity('Gunakan email UGM dengan domain @mail.ugm.ac.id');
+                } else {
+                    emailInput.setCustomValidity('');
+                }
+            }
+
+            if (emailInput) {
+                emailInput.addEventListener('input', validateUgmEmail);
+                emailInput.addEventListener('change', validateUgmEmail);
+            }
         });
     </script>
 </body>

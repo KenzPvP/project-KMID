@@ -53,7 +53,25 @@
                 <div class="lg:col-span-6 flex justify-center lg:justify-end">
                     <div class="bg-white rounded-[24px] sm:rounded-3xl p-6 sm:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.06)] border border-slate-100 max-w-[460px] w-full mx-auto">
                         <h2 class="text-2xl sm:text-3xl font-bold text-[#1F1F1F] tracking-tight">Login</h2>
-                        <p class="text-xs sm:text-sm text-[#707070] mt-1.5 mb-6 sm:mb-8 font-normal">Gunakan email dan kata sandi akun KMID kamu.</p>
+                        <p class="text-xs sm:text-sm text-[#707070] mt-1.5 mb-6 font-normal">Gunakan email dan kata sandi akun KMID kamu.</p>
+
+                        @if (session('success'))
+                            <div class="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2.5 text-emerald-800 text-xs sm:text-sm font-medium">
+                                <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <span>{{ session('success') }}</span>
+                            </div>
+                        @endif
+
+                        @if ($errors->any())
+                            <div class="mb-5 p-3.5 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2.5 text-red-700 text-xs sm:text-sm font-medium">
+                                <svg class="w-5 h-5 text-red-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <div class="space-y-1">
+                                    @foreach ($errors->all() as $error)
+                                        <p>{{ $error }}</p>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
 
                         <form action="{{ route('login') }}" method="POST" class="space-y-4">
                             @csrf
@@ -67,8 +85,14 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                         </svg>
                                     </div>
-                                    <input type="email" id="email" name="email" required placeholder="Masukkan email kamu" class="w-full pl-11 pr-4 py-3 bg-white border border-[#E2E8F0] rounded-xl text-sm text-[#1F1F1F] placeholder-[#9CA3AF] focus:outline-none focus:border-[#004ADA] focus:ring-2 focus:ring-blue-500/20 transition-all">
+                                    <input type="email" id="email" name="email" value="{{ old('email') }}" required placeholder="nama@mail.ugm.ac.id" class="w-full pl-11 pr-4 py-3 bg-white border @error('email') border-red-500 focus:border-red-500 focus:ring-red-500/20 @else border-[#E2E8F0] focus:border-[#004ADA] focus:ring-blue-500/20 @enderror rounded-xl text-sm text-[#1F1F1F] placeholder-[#9CA3AF] focus:outline-none focus:ring-2 transition-all">
                                 </div>
+                                @error('email')
+                                    <p class="text-xs text-red-600 mt-1.5 font-medium flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        <span>{{ $message }}</span>
+                                    </p>
+                                @enderror
                             </div>
 
                             <!-- Kata Sandi Field -->
@@ -126,6 +150,21 @@
             const toggleBtn = document.getElementById('toggle-password');
             const passInput = document.getElementById('password');
             const eyeIcon = document.getElementById('eye-icon');
+            const emailInput = document.getElementById('email');
+
+            function validateUgmEmail() {
+                const val = (emailInput.value || '').trim();
+                if (val && !val.toLowerCase().endsWith('@mail.ugm.ac.id')) {
+                    emailInput.setCustomValidity('Gunakan email UGM dengan domain @mail.ugm.ac.id');
+                } else {
+                    emailInput.setCustomValidity('');
+                }
+            }
+
+            if (emailInput) {
+                emailInput.addEventListener('input', validateUgmEmail);
+                emailInput.addEventListener('change', validateUgmEmail);
+            }
             
             if (toggleBtn && passInput && eyeIcon) {
                 toggleBtn.addEventListener('click', () => {
