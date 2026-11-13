@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\OprecDashboardController;
+use App\Http\Controllers\StaffDashboardController;
 use App\Models\User;
 use App\Rules\UgmEmail;
 use Illuminate\Http\Request;
@@ -26,7 +29,21 @@ Route::get('/information', function () {
     return view('information');
 })->name('information');
 
+Route::get('/dashboard', function () {
+    $user = Auth::user();
+
+    return match ($user?->role) {
+        'admin' => redirect()->route('admin.dashboard'),
+        'staff' => redirect()->route('staff.dashboard'),
+        default => redirect()->route('oprec.dashboard'),
+    };
+})->middleware('auth')->name('dashboard');
+
 Route::get('/login', function () {
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    }
+
     return view('login');
 })->name('login');
 
@@ -39,7 +56,13 @@ Route::post('/login', function (Request $request) {
     if (Auth::attempt($credentials)) {
         $request->session()->regenerate();
 
-        return redirect()->intended(route('home'));
+        $user = Auth::user();
+
+        return match ($user->role) {
+            'admin' => redirect()->route('admin.dashboard'),
+            'staff' => redirect()->route('staff.dashboard'),
+            default => redirect()->route('oprec.dashboard'),
+        };
     }
 
     return back()->withErrors([
@@ -48,6 +71,10 @@ Route::post('/login', function (Request $request) {
 });
 
 Route::get('/register', function () {
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    }
+
     return view('register');
 })->name('register');
 
@@ -62,10 +89,23 @@ Route::post('/register', function (Request $request) {
         'name' => $validated['name'],
         'email' => $validated['email'],
         'password' => $validated['password'],
+        'role' => 'pendaftar',
+        'is_active' => true,
     ]);
 
-    return redirect()->route('login')->with('success', 'Pendaftaran akun berhasil. Silakan masuk menggunakan akun Anda.');
+    Auth::login($user);
+    $request->session()->regenerate();
+
+    return redirect()->route('oprec.dashboard');
 });
+
+Route::post('/logout', function (Request $request) {
+    Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    return redirect()->route('login');
+})->name('logout');
 
 Route::get('/open-recruitment', function () {
     return view('open-recruitment');
@@ -75,9 +115,12 @@ Route::get('/oprec', function () {
     return view('open-recruitment');
 })->name('oprec');
 
-Route::prefix('admin')->name('admin.')->group(function () {
+// Route Group: Role Admin
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+
     Route::get('/', function () {
-        return redirect()->route('admin.pendaftar.index');
+        return redirect()->route('admin.dashboard');
     })->name('index');
 
     Route::get('/kelola-akun', function () {
@@ -129,10 +172,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
     })->name('persyaratan-guidebook');
 });
 
-// Route Group: Role Staff / Manager (Hanya Pengelolaan Pendaftaran, Tidak Bisa Mengelola Konten)
-Route::prefix('staff')->name('staff.')->group(function () {
+// Route Group: Role Staff / Manager
+Route::prefix('staff')->name('staff.')->middleware(['auth', 'role:staff'])->group(function () {
+    Route::get('/dashboard', [StaffDashboardController::class, 'index'])->name('dashboard');
+
     Route::get('/', function () {
-        return redirect()->route('staff.pendaftar.index');
+        return redirect()->route('staff.dashboard');
     })->name('index');
 
     Route::get('/kelola-akun', function () {
@@ -158,4 +203,13 @@ Route::prefix('staff')->name('staff.')->group(function () {
     Route::get('/pengaturan-pendaftaran', function () {
         return view('admin.pengaturan-pendaftaran');
     })->name('pendaftar.pengaturan');
+});
+
+// Route Group: Role Pendaftar
+Route::prefix('oprec')->name('oprec.')->middleware(['auth', 'role:pendaftar'])->group(function () {
+    Route::get('/dashboard', [OprecDashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/', function () {
+        return redirect()->route('oprec.dashboard');
+    })->name('index');
 });
