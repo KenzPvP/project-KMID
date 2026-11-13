@@ -122,7 +122,7 @@
                     
                     <nav class="space-y-1.5">
                         <!-- Menu: Kepengurusan -->
-                        <a href="{{ route('admin.kepengurusan') }}" class="w-full flex items-center justify-between px-3.5 py-3 rounded-xl transition-all duration-200 text-left group {{ request()->routeIs('admin.kepengurusan') ? 'bg-[#EBF2FE] text-[#004ADA] font-semibold' : 'text-[#707070] font-medium hover:bg-slate-50 hover:text-[#1F1F1F]' }}">
+                        <a href="{{ route('admin.kepengurusan') }}" class="w-full flex items-center justify-between px-3.5 py-3 rounded-xl transition-all duration-200 text-left group {{ request()->routeIs('admin.kepengurusan*') ? 'bg-[#EBF2FE] text-[#004ADA] font-semibold' : 'text-[#707070] font-medium hover:bg-slate-50 hover:text-[#1F1F1F]' }}">
                             <div class="flex items-center gap-3">
                                 <div class="w-5 h-5 shrink-0 flex items-center justify-center">
                                     <svg class="w-5 h-5 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -131,7 +131,7 @@
                                 </div>
                                 <span class="text-xs sm:text-sm tracking-tight">Kepengurusan</span>
                             </div>
-                            <div class="w-1.5 h-6 bg-[#004ADA] rounded-full {{ request()->routeIs('admin.kepengurusan') ? 'block' : 'hidden' }}"></div>
+                            <div class="w-1.5 h-6 bg-[#004ADA] rounded-full {{ request()->routeIs('admin.kepengurusan*') ? 'block' : 'hidden' }}"></div>
                         </a>
 
                         <!-- Menu: Galeri Aktivitas -->

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\KepengurusanController;
 use App\Http\Controllers\PendaftarController;
 use App\Models\User;
 use App\Rules\UgmEmail;
@@ -149,9 +150,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         return view('admin.pengaturan-pendaftaran');
     })->name('pendaftar.pengaturan');
 
-    Route::get('/kepengurusan', function () {
-        return view('admin.kepengurusan');
-    })->name('kepengurusan');
+    Route::get('/kepengurusan', [KepengurusanController::class, 'index'])->name('kepengurusan');
+    Route::get('/kepengurusan/tambah', [KepengurusanController::class, 'create'])->name('kepengurusan.create');
+    Route::post('/kepengurusan/tambah', [KepengurusanController::class, 'store'])->name('kepengurusan.store');
+    Route::delete('/kepengurusan/{pengurus}', [KepengurusanController::class, 'destroy'])->name('kepengurusan.destroy');
 
     Route::get('/galeri-aktivitas', function () {
         return view('admin.galeri-aktivitas');
