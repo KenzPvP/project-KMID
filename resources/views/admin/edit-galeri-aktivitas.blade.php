@@ -1,4 +1,5 @@
 @extends('layouts.admin')
+@section('show_content_management', true)
 
 @section('title', 'Admin KMID - Edit Galeri Aktivitas')
 @section('topbar_breadcrumb', 'Admin KMID / Galeri Aktivitas')
