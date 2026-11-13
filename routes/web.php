@@ -64,9 +64,7 @@ Route::post('/register', function (Request $request) {
         'password' => $validated['password'],
     ]);
 
-    Auth::login($user);
-
-    return redirect()->route('home');
+    return redirect()->route('login')->with('success', 'Pendaftaran akun berhasil. Silakan masuk menggunakan akun Anda.');
 });
 
 Route::get('/open-recruitment', function () {
