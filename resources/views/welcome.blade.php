@@ -45,7 +45,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 17L17 7M17 7H7M17 7V17"/>
                         </svg>
                     </a>
-                    <a href="#join" class="inline-flex items-center justify-center px-8 py-3.5 bg-[#FEA515] text-white font-semibold text-sm sm:text-base rounded-xl transition-all duration-300 hover:bg-[#EE9401] hover:shadow-xl hover:shadow-orange-500/30 hover:-translate-y-0.5 active:translate-y-0">
+                    <a href="{{ route('login') }}" class="inline-flex items-center justify-center px-8 py-3.5 bg-[#FEA515] text-white font-semibold text-sm sm:text-base rounded-xl transition-all duration-300 hover:bg-[#EE9401] hover:shadow-xl hover:shadow-orange-500/30 hover:-translate-y-0.5 active:translate-y-0">
                         Join KMID
                     </a>
                 </div>

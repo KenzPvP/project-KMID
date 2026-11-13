@@ -50,7 +50,7 @@
 
             <!-- CTA Button -->
             <div class="hidden md:block">
-                <a href="{{ request()->routeIs('activities') ? '#agenda' : (request()->routeIs('impact', 'information') ? '#lidm' : (request()->routeIs('about') ? route('home').'#join' : '#join')) }}" class="inline-flex items-center justify-center px-6 py-2.5 bg-[#FEA515] text-white font-semibold text-sm rounded-full transition-all duration-300 hover:bg-[#EE9401] hover:shadow-lg hover:shadow-orange-500/25 active:scale-95">
+                <a href="{{ route('login') }}" class="inline-flex items-center justify-center px-6 py-2.5 bg-[#FEA515] text-white font-semibold text-sm rounded-full transition-all duration-300 hover:bg-[#EE9401] hover:shadow-lg hover:shadow-orange-500/25 active:scale-95">
                     Join KMID
                 </a>
             </div>
@@ -86,7 +86,7 @@
                 'text-base font-medium text-[#1F1F1F] hover:text-[#004ADA]' => !request()->routeIs('information'),
             ]) @if(request()->routeIs('information')) aria-current="page" @endif>Information</a>
             <div class="pt-2 border-t border-slate-100">
-                <a href="{{ request()->routeIs('activities') ? '#agenda' : (request()->routeIs('impact', 'information') ? '#lidm' : (request()->routeIs('about') ? route('home').'#join' : '#join')) }}" class="block w-full text-center px-5 py-3 bg-[#FEA515] text-white font-semibold text-sm rounded-full shadow-md">
+                <a href="{{ route('login') }}" class="block w-full text-center px-5 py-3 bg-[#FEA515] text-white font-semibold text-sm rounded-full shadow-md">
                     Join KMID
                 </a>
             </div>
