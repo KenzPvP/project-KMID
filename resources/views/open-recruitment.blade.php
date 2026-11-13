@@ -1,6 +1,7 @@
 @php
     $isBerkasDiterima = $pendaftar && in_array($pendaftar->status, ['Lolos Berkas', 'Lolos Wawancara', 'Diterima']);
     $hasRegistered = !empty($pendaftar);
+    $activeTab = request('tab', ($isBerkasDiterima ? 'wawancara' : 'pendaftaran'));
 @endphp
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
@@ -64,7 +65,7 @@
                 <!-- Navigation Links -->
                 <nav class="p-4 space-y-2 mt-2">
                     <!-- Nav Item 1: Pendaftaran Oprec Staff KMID -->
-                    <button type="button" id="nav-btn-pendaftaran" class="portal-nav-item w-full flex items-center justify-between px-3.5 py-3 rounded-xl transition-all duration-200 text-left group bg-[#EBF2FE] text-[#004ADA]">
+                    <button type="button" id="nav-btn-pendaftaran" class="portal-nav-item w-full flex items-center justify-between px-3.5 py-3 rounded-xl transition-all duration-200 text-left group {{ $activeTab === 'pendaftaran' ? 'bg-[#EBF2FE] text-[#004ADA]' : 'text-[#707070] hover:bg-slate-50 hover:text-[#1F1F1F]' }}">
                         <div class="flex items-center gap-3">
                             <!-- Document / Paper Icon -->
                             <div class="w-5 h-5 shrink-0 flex items-center justify-center">
@@ -75,12 +76,12 @@
                             <span class="text-xs sm:text-sm font-semibold tracking-tight">Pendaftaran Oprec<br class="hidden sm:inline"> Staff KMID</span>
                         </div>
                         <!-- Active Indicator Bar -->
-                        <div class="indicator-bar w-1.5 h-6 bg-[#004ADA] rounded-full"></div>
+                        <div class="indicator-bar w-1.5 h-6 bg-[#004ADA] rounded-full {{ $activeTab === 'pendaftaran' ? '' : 'hidden' }}"></div>
                     </button>
 
                     <!-- Nav Item 2: Pengisian Jadwal Wawancara (Hanya muncul jika berkas sudah disetujui / di-ACC admin) -->
                     @if($isBerkasDiterima)
-                    <button type="button" id="nav-btn-wawancara" class="portal-nav-item w-full flex items-center justify-between px-3.5 py-3 rounded-xl transition-all duration-200 text-left group text-[#707070] hover:bg-slate-50 hover:text-[#1F1F1F]">
+                    <button type="button" id="nav-btn-wawancara" class="portal-nav-item w-full flex items-center justify-between px-3.5 py-3 rounded-xl transition-all duration-200 text-left group {{ $activeTab === 'wawancara' ? 'bg-[#EBF2FE] text-[#004ADA]' : 'text-[#707070] hover:bg-slate-50 hover:text-[#1F1F1F]' }}">
                         <div class="flex items-center gap-3">
                             <!-- Calendar Icon -->
                             <div class="w-5 h-5 shrink-0 flex items-center justify-center">
@@ -90,8 +91,8 @@
                             </div>
                             <span class="text-xs sm:text-sm font-medium tracking-tight">Pengisian Jadwal<br class="hidden sm:inline"> Wawancara</span>
                         </div>
-                        <!-- Active Indicator Bar (Hidden by default on inactive) -->
-                        <div class="indicator-bar w-1.5 h-6 bg-[#004ADA] rounded-full hidden"></div>
+                        <!-- Active Indicator Bar -->
+                        <div class="indicator-bar w-1.5 h-6 bg-[#004ADA] rounded-full {{ $activeTab === 'wawancara' ? '' : 'hidden' }}"></div>
                     </button>
                     @endif
                 </nav>
@@ -204,7 +205,7 @@
                 <!-- ============================================================== -->
                 <!-- SECTION 1: PENDAFTARAN OPREC STAFF KMID                        -->
                 <!-- ============================================================== -->
-                <section id="section-pendaftaran" class="portal-section w-full max-w-[880px] relative z-10">
+                <section id="section-pendaftaran" class="portal-section w-full max-w-[880px] relative z-10 {{ $activeTab === 'pendaftaran' ? '' : 'hidden' }}">
                     <div class="bg-white rounded-[24px] sm:rounded-[28px] p-6 sm:p-10 lg:p-12 shadow-[0_10px_35px_rgba(0,0,0,0.03)] border border-gray-100/80">
                         
                         @if (session('success'))
@@ -546,7 +547,7 @@
                 <!-- SECTION 2: PENGISIAN JADWAL WAWANCARA                          -->
                 <!-- ============================================================== -->
                 @if($isBerkasDiterima)
-                <section id="section-wawancara" class="portal-section w-full max-w-[880px] relative z-10 hidden">
+                <section id="section-wawancara" class="portal-section w-full max-w-[880px] relative z-10 {{ $activeTab === 'wawancara' ? '' : 'hidden' }}">
                     <div class="bg-white rounded-[24px] sm:rounded-[28px] p-6 sm:p-10 lg:p-12 shadow-[0_10px_35px_rgba(0,0,0,0.03)] border border-gray-100/80">
                         
                         <!-- Top Navigation Back Button -->
@@ -763,6 +764,8 @@
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('tab') === 'wawancara' && navBtnWawancara) {
                 window.switchSection('wawancara');
+            } else if (urlParams.get('tab') === 'pendaftaran' && navBtnPendaftaran) {
+                window.switchSection('pendaftaran');
             } else if (urlParams.get('step') === 'b') {
                 stepA?.classList.add('hidden');
                 stepB?.classList.remove('hidden');
@@ -771,6 +774,27 @@
                 stepB?.classList.add('hidden');
                 stepC?.classList.remove('hidden');
             }
+
+            @if($hasRegistered && !$isBerkasDiterima)
+            // Realtime polling untuk mendeteksi persetujuan (ACC) berkas oleh Admin secara instan
+            const checkStatusInterval = setInterval(() => {
+                fetch("{{ route('open-recruitment.check-status') }}", {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.isBerkasDiterima) {
+                        clearInterval(checkStatusInterval);
+                        // Langsung alihkan ke halaman jadwal wawancara seketika di-ACC Admin
+                        window.location.href = "{{ route('open-recruitment', ['tab' => 'wawancara']) }}";
+                    }
+                })
+                .catch(() => {});
+            }, 3000);
+            @endif
 
             // Mobile Sidebar Drawer Toggle
             const sidebar = document.getElementById('sidebar');

@@ -139,6 +139,21 @@ Route::get('/open-recruitment', function () {
     return view('open-recruitment', compact('pendaftar'));
 })->name('open-recruitment');
 
+Route::get('/open-recruitment/check-status', function () {
+    if (!Auth::check()) {
+        return response()->json(['error' => 'Unauthenticated'], 401);
+    }
+    $pendaftar = \App\Models\Pendaftar::where('email', Auth::user()->email)->first();
+    $status = $pendaftar->status ?? null;
+    $isBerkasDiterima = $pendaftar && in_array($status, ['Lolos Berkas', 'Lolos Wawancara', 'Diterima']);
+
+    return response()->json([
+        'hasRegistered' => !empty($pendaftar),
+        'status' => $status,
+        'isBerkasDiterima' => $isBerkasDiterima,
+    ]);
+})->name('open-recruitment.check-status');
+
 Route::post('/open-recruitment', function (Request $request) {
     if (!Auth::check()) {
         return redirect()->route('login');

@@ -30,6 +30,15 @@
         <h1 class="text-2xl sm:text-3xl font-bold text-[#1F1F1F] tracking-tight">Detail Pendaftar</h1>
     </div>
 
+    @if(session('success'))
+        <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl flex items-center gap-2.5 text-xs sm:text-sm">
+            <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="font-semibold">{{ session('success') }}</span>
+        </div>
+    @endif
+
     <!-- Back Link Button -->
     <div>
         <a href="{{ route($routePrefix . 'index') }}" class="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#004ADA] hover:underline">
@@ -112,52 +121,50 @@
                                 </svg>
                             </div>
                             <div class="min-w-0 flex-1">
-                                <span class="text-xs font-bold text-[#1F1F1F] block">CV</span>
-                                <p class="text-xs font-semibold text-[#1F1F1F] truncate mt-0.5">CV_Tariq_Hifzhillah.pdf</p>
-                                <p class="text-[11px] text-[#707070]">Dokumen PDF</p>
+                                <span class="text-xs font-bold text-[#1F1F1F] block">CV Pendaftar</span>
+                                <p class="text-xs font-semibold text-[#1F1F1F] truncate mt-0.5">
+                                    {{ !empty($pendaftar->cv_url) ? basename($pendaftar->cv_url) : 'Belum diunggah' }}
+                                </p>
+                                <p class="text-[11px] text-[#707070]">Berkas Dokumen</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-2 mt-4 pt-3 border-t border-gray-200/60">
-                            <button type="button" class="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-medium text-[#1F1F1F] hover:bg-gray-50 transition-colors">
-                                Lihat
-                            </button>
-                            <button type="button" class="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-medium text-[#1F1F1F] hover:bg-gray-50 transition-colors">
-                                Unduh
-                            </button>
+                            @if(!empty($pendaftar->cv_url))
+                                <a href="{{ asset($pendaftar->cv_url) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-medium text-[#004ADA] hover:bg-blue-50/50 transition-colors">
+                                    <span>Lihat Berkas</span>
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                </a>
+                            @else
+                                <span class="text-xs text-gray-400">Tidak ada berkas CV</span>
+                            @endif
                         </div>
                     </div>
 
                     <!-- Box 2: Portofolio -->
                     <div class="p-4 rounded-2xl border border-gray-200/90 bg-gray-50/50 flex flex-col justify-between">
                         <div class="flex items-start gap-3">
-                            <div class="w-9 h-9 rounded-xl bg-blue-50 text-[#004ADA] flex items-center justify-center shrink-0">
+                            <div class="w-9 h-9 rounded-xl bg-amber-50 text-[#FEA515] flex items-center justify-center shrink-0">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                 </svg>
                             </div>
                             <div class="min-w-0 flex-1">
-                                <span class="text-xs font-bold text-[#1F1F1F] block">Portofolio</span>
-                                <p class="text-xs font-semibold text-[#1F1F1F] truncate mt-0.5">Portofolio_Tariq_Hifzhillah.pdf</p>
-                                <p class="text-[11px] text-[#707070]">Dokumen PDF</p>
+                                <span class="text-xs font-bold text-[#1F1F1F] block">Divisi &amp; Portofolio</span>
+                                <p class="text-xs font-semibold text-[#1F1F1F] truncate mt-0.5">{{ $pendaftar->division ?? 'Media Creative' }}</p>
+                                <p class="text-[11px] text-[#707070]">Pilihan divisi pendaftar</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-2 mt-4 pt-3 border-t border-gray-200/60">
-                            <button type="button" class="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-medium text-[#1F1F1F] hover:bg-gray-50 transition-colors">
-                                Lihat
-                            </button>
-                            <button type="button" class="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-medium text-[#1F1F1F] hover:bg-gray-50 transition-colors">
-                                Unduh
-                            </button>
+                            <span class="text-xs font-medium text-[#707070]">Sesuai formulir pendaftaran</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Motivasi Singkat -->
                 <div>
-                    <h4 class="text-xs font-semibold text-[#707070] mb-2">Motivasi singkat</h4>
-                    <div class="space-y-2 text-xs sm:text-sm text-[#1F1F1F] leading-relaxed">
-                        <p>Saya ingin mengembangkan identitas visual dan konten kreatif KMID. Saya terbiasa menggunakan Figma dan Adobe Illustrator untuk desain publikasi serta senang berkolaborasi dalam tim.</p>
-                        <p>Saya tertarik menyusun publikasi yang komunikatif dan memperluas jangkauan kegiatan KMID melalui media sosial. Pengalaman publikasi kepanitiaan menjadi bekal saya untuk berkontribusi.</p>
+                    <h4 class="text-xs font-semibold text-[#707070] mb-2">Motivasi &amp; Alasan Memilih Divisi</h4>
+                    <div class="p-4 bg-gray-50/70 border border-gray-200/60 rounded-xl text-xs sm:text-sm text-[#1F1F1F] leading-relaxed">
+                        <p>{{ $pendaftar->motivation ?? 'Tidak ada catatan motivasi yang dicantumkan.' }}</p>
                     </div>
                 </div>
             </div>
@@ -227,103 +234,150 @@
 
                 <div class="space-y-4 text-xs sm:text-sm">
                     <div>
-                        <p class="text-xs text-[#707070] mb-0.5">Tanggal wawancara</p>
-                        <p class="font-semibold text-[#1F1F1F]">13 November 2026</p>
+                        <p class="text-xs text-[#707070] mb-0.5">Hari / Tanggal wawancara</p>
+                        <p class="font-semibold text-[#1F1F1F]">{{ $pendaftar->interview_date ?? '8 - 10 Oktober 2026' }}</p>
                     </div>
 
                     <div>
-                        <p class="text-xs text-[#707070] mb-0.5">Jam wawancara</p>
-                        <p class="font-semibold text-[#1F1F1F]">09.00-09.15 WIB</p>
+                        <p class="text-xs text-[#707070] mb-0.5">Sesi / Jam wawancara</p>
+                        <p class="font-semibold text-[#1F1F1F]">
+                            @if(!empty($pendaftar->interview_time))
+                                <span class="text-[#004ADA]">{{ $pendaftar->interview_time }} WIB</span>
+                            @else
+                                <span class="text-[#9CA3AF] italic">Belum dipilih oleh pendaftar</span>
+                            @endif
+                        </p>
                     </div>
 
                     <div>
-                        <p class="text-xs text-[#707070] mb-0.5">Pewawancara</p>
-                        <p class="font-semibold text-[#1F1F1F] leading-tight">Dwi Putri Lestari<br>Rizky Aditya</p>
+                        <p class="text-xs text-[#707070] mb-0.5">Divisi pendaftar</p>
+                        <p class="font-semibold text-[#1F1F1F] leading-tight">{{ $pendaftar->division ?? 'Media Creative' }}</p>
                     </div>
 
                     <div>
-                        <p class="text-xs text-[#707070] mb-0.5">Mode</p>
-                        <p class="font-semibold text-[#1F1F1F]">Offline</p>
-                    </div>
-
-                    <div>
-                        <p class="text-xs text-[#707070] mb-0.5">Lokasi</p>
-                        <p class="font-semibold text-[#1F1F1F] leading-snug">Ruang Diskusi KMID, Sekolah Vokasi UGM</p>
+                        <p class="text-xs text-[#707070] mb-0.5">Mode &amp; Lokasi</p>
+                        <p class="font-semibold text-[#1F1F1F] leading-snug">Offline · Ruang Diskusi KMID, SV UGM</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Card 5: Penilaian Wawancara -->
+            <!-- Card 6: Keputusan Seleksi / Verifikasi Berkas -->
             <div class="bg-white rounded-[24px] sm:rounded-[28px] p-6 shadow-[0_10px_35px_rgba(0,0,0,0.03)] border border-gray-100/90">
-                <div class="flex items-center gap-2 mb-4">
-                    <svg class="w-5 h-5 text-[#004ADA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-                    </svg>
-                    <h3 class="text-base font-bold text-[#1F1F1F]">Penilaian wawancara</h3>
-                </div>
+                <h3 class="text-base font-bold text-[#1F1F1F] mb-2">Keputusan Seleksi</h3>
+                
+                @if($pendaftar->status === 'Mendaftar')
+                    <p class="font-semibold text-xs text-amber-700">Tahap 1: Verifikasi Berkas Pendaftaran</p>
+                    <p class="text-xs text-[#707070] mt-1 leading-relaxed">
+                        Pendaftar baru mengirimkan berkas. Jika disetujui (ACC), status akan diubah menjadi <strong>Lolos Berkas</strong> dan pendaftar dapat langsung memilih jadwal wawancara di dashboard oprec mereka.
+                    </p>
 
-                <!-- Total Score Blue Banner -->
-                <div class="bg-[#EBF2FE] rounded-2xl p-4 flex items-center justify-between mb-4">
-                    <span class="text-2xl font-extrabold text-[#004ADA]">86 / 100</span>
-                    <span class="text-xs font-semibold text-[#004ADA]">Skor total</span>
-                </div>
-
-                <!-- Sub-scores -->
-                <div class="space-y-2.5 text-xs text-[#1F1F1F] pb-4 border-b border-gray-100">
-                    <div class="flex justify-between items-center">
-                        <span class="text-[#707070]">Motivasi & komitmen</span>
-                        <span class="font-semibold">17 / 20</span>
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row items-center gap-2.5 mt-5">
+                        <button type="button" onclick="openLoloskanModal()" class="w-full sm:flex-1 py-2.5 px-4 bg-[#004ADA] hover:bg-[#003bb0] text-white rounded-xl text-xs font-semibold shadow-xs transition-colors text-center cursor-pointer">
+                            Setujui (Lolos Berkas)
+                        </button>
+                        <button type="button" onclick="openTolakModal()" class="w-full sm:w-24 py-2.5 px-4 border border-red-300 text-red-600 hover:bg-red-50 rounded-xl text-xs font-semibold transition-colors text-center cursor-pointer">
+                            Tolak
+                        </button>
                     </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-[#707070]">Kompetensi divisi</span>
-                        <span class="font-semibold">35 / 40</span>
+                @elseif($pendaftar->status === 'Lolos Berkas')
+                    <p class="font-semibold text-xs text-emerald-700">Tahap 2: Lolos Berkas (ACC Admin)</p>
+                    <p class="text-xs text-[#707070] mt-1 leading-relaxed">
+                        Berkas telah disetujui. Pendaftar saat ini dapat memilih jadwal sesi wawancara.
+                        @if(!empty($pendaftar->interview_time))
+                            <br><span class="font-bold text-[#1F1F1F]">Jadwal Terpilih:</span> {{ $pendaftar->interview_time }} WIB ({{ $pendaftar->interview_date ?? '8 - 10 Oktober 2026' }})
+                        @else
+                            <br><span class="text-amber-600">Menunggu pendaftar mengonfirmasi sesi wawancara.</span>
+                        @endif
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row items-center gap-2.5 mt-5">
+                        <button type="button" onclick="openLolosWawancaraModal()" class="w-full sm:flex-1 py-2.5 px-4 bg-[#004ADA] hover:bg-[#003bb0] text-white rounded-xl text-xs font-semibold shadow-xs transition-colors text-center cursor-pointer">
+                            Loloskan Wawancara
+                        </button>
+                        <button type="button" onclick="openTolakModal()" class="w-full sm:w-24 py-2.5 px-4 border border-red-300 text-red-600 hover:bg-red-50 rounded-xl text-xs font-semibold transition-colors text-center cursor-pointer">
+                            Tolak
+                        </button>
                     </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-[#707070]">Komunikasi</span>
-                        <span class="font-semibold">17 / 20</span>
+                @elseif($pendaftar->status === 'Lolos Wawancara')
+                    <p class="font-semibold text-xs text-blue-700">Tahap 3: Keputusan Akhir Penerimaan</p>
+                    <p class="text-xs text-[#707070] mt-1 leading-relaxed">
+                        Pendaftar telah menyelesaikan wawancara dan dinyatakan lolos. Silakan tentukan keputusan akhir untuk menerima pendaftar sebagai staf/anggota KMID.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row items-center gap-2.5 mt-5">
+                        <button type="button" onclick="openTerimaModal()" class="w-full sm:flex-1 py-2.5 px-4 bg-[#12B76A] hover:bg-[#0f9f5c] text-white rounded-xl text-xs font-semibold shadow-xs transition-colors text-center cursor-pointer">
+                            Terima sebagai Anggota
+                        </button>
+                        <button type="button" onclick="openTolakModal()" class="w-full sm:w-24 py-2.5 px-4 border border-red-300 text-red-600 hover:bg-red-50 rounded-xl text-xs font-semibold transition-colors text-center cursor-pointer">
+                            Tolak
+                        </button>
                     </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-[#707070]">Kolaborasi</span>
-                        <span class="font-semibold">17 / 20</span>
+                @elseif($pendaftar->status === 'Diterima')
+                    <p class="font-semibold text-xs text-[#12B76A]">Resmi Diterima</p>
+                    <p class="text-xs text-[#707070] mt-1 leading-relaxed">Pendaftar telah resmi diterima sebagai anggota KMID UGM.</p>
+                @else
+                    <p class="font-semibold text-xs text-[#D92D20]">Status: Tidak Lolos</p>
+                    <p class="text-xs text-[#707070] mt-1 leading-relaxed">Pendaftar tidak lolos pada tahapan seleksi.</p>
+                    <div class="mt-4">
+                        <button type="button" onclick="openLoloskanModal()" class="w-full py-2 px-3 border border-gray-200 text-[#505050] hover:text-[#004ADA] rounded-xl text-xs font-medium transition-colors text-center cursor-pointer">
+                            Pulihkan ke Lolos Berkas
+                        </button>
                     </div>
-                </div>
-
-                <!-- Catatan Pewawancara -->
-                <div class="mt-4">
-                    <p class="text-xs font-semibold text-[#707070] mb-1">Catatan pewawancara</p>
-                    <p class="text-xs text-[#1F1F1F] leading-relaxed">Mampu menjelaskan alur pengembangan produk dengan runtut. Komunikasi jelas dan terbuka terhadap masukan. Perlu pendampingan pada dokumentasi teknis.</p>
-                </div>
-
-                <!-- Rekomendasi -->
-                <div class="mt-4">
-                    <p class="text-xs font-semibold text-[#707070] mb-1.5">Rekomendasi</p>
-                    <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-[#EAF8F0] text-[#1E8E3E]">
-                        Terima
-                    </span>
-                    <p class="text-[11px] text-[#8E8E93] mt-2">Dinilai pada 13 Nov 2026 · 09.18 WIB</p>
-                </div>
-            </div>
-
-            <!-- Card 6: Penerimaan -->
-            <div class="bg-white rounded-[24px] sm:rounded-[28px] p-6 shadow-[0_10px_35px_rgba(0,0,0,0.03)] border border-gray-100/90">
-                <h3 class="text-base font-bold text-[#1F1F1F] mb-2">Penerimaan</h3>
-                <p class="font-semibold text-xs text-[#1F1F1F]">Keputusan akhir belum ditetapkan.</p>
-                <p class="text-xs text-[#707070] mt-0.5 leading-relaxed">Rekomendasi pewawancara tidak otomatis mengubah status pendaftar.</p>
-
-                <!-- Action Buttons -->
-                <div class="flex flex-col sm:flex-row items-center gap-2.5 mt-5">
-                    <button type="button" onclick="openTerimaModal()" class="w-full sm:flex-1 py-2.5 px-4 bg-[#004ADA] hover:bg-[#003bb0] text-white rounded-xl text-xs font-semibold shadow-xs transition-colors text-center">
-                        Terima Pendaftar
-                    </button>
-                    <button type="button" onclick="openTolakModal()" class="w-full sm:w-24 py-2.5 px-4 border border-red-300 text-red-600 hover:bg-red-50 rounded-xl text-xs font-semibold transition-colors text-center">
-                        Tolak
-                    </button>
-                </div>
-                <p class="text-[11px] text-[#8E8E93] mt-2.5">Perubahan status memerlukan konfirmasi.</p>
+                @endif
+                <p class="text-[11px] text-[#8E8E93] mt-2.5">Perubahan status langsung terupdate ke Dashboard pendaftar.</p>
             </div>
 
         </div>
 
+    </div>
+</div>
+
+<!-- ============================================================== -->
+<!-- FORM HIDDEN UNTUK PERUBAHAN STATUS                             -->
+<!-- ============================================================== -->
+<form id="form-action-status" method="POST" action="{{ route($routePrefix . 'status', $pendaftar->id) }}" class="hidden">
+    @csrf
+    <input type="hidden" name="status" id="input-action-status" value="">
+</form>
+
+<!-- ============================================================== -->
+<!-- MODAL: SETUJUI / LOLOSKAN BERKAS                              -->
+<!-- ============================================================== -->
+<div id="modal-loloskan" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 hidden">
+    <div class="bg-white rounded-[24px] max-w-md w-full p-6 shadow-2xl border border-gray-100">
+        <h3 class="text-lg font-bold text-[#1F1F1F] mb-2">Setujui Berkas Pendaftar?</h3>
+        <p class="text-xs text-[#707070] leading-relaxed mb-6">
+            {{ $pendaftar->name }} akan disetujui (ACC) dan statusnya diubah menjadi <strong>Lolos Berkas</strong>. Bagian jadwal wawancara pada dashboard oprec pendaftar akan otomatis terbuka dan langsung aktif.
+        </p>
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
+            <button type="button" onclick="closeLoloskanModal()" class="px-4 py-2 border border-gray-200 rounded-xl text-xs font-medium text-[#707070] hover:text-[#1F1F1F] hover:bg-gray-50 transition-colors">
+                Batal
+            </button>
+            <button type="button" onclick="submitStatus('Lolos Berkas')" class="px-5 py-2 bg-[#004ADA] hover:bg-[#003bb0] text-white rounded-xl text-xs font-semibold shadow-xs transition-colors">
+                Ya, Setujui Berkas
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================== -->
+<!-- MODAL: LOLOSKAN WAWANCARA                                      -->
+<!-- ============================================================== -->
+<div id="modal-lolos-wawancara" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 hidden">
+    <div class="bg-white rounded-[24px] max-w-md w-full p-6 shadow-2xl border border-gray-100">
+        <h3 class="text-lg font-bold text-[#1F1F1F] mb-2">Loloskan Wawancara?</h3>
+        <p class="text-xs text-[#707070] leading-relaxed mb-6">
+            {{ $pendaftar->name }} akan dipindahkan ke status <strong>Lolos Wawancara</strong>.
+        </p>
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
+            <button type="button" onclick="closeLolosWawancaraModal()" class="px-4 py-2 border border-gray-200 rounded-xl text-xs font-medium text-[#707070] hover:text-[#1F1F1F] hover:bg-gray-50 transition-colors">
+                Batal
+            </button>
+            <button type="button" onclick="submitStatus('Lolos Wawancara')" class="px-5 py-2 bg-[#004ADA] hover:bg-[#003bb0] text-white rounded-xl text-xs font-semibold shadow-xs transition-colors">
+                Loloskan Wawancara
+            </button>
+        </div>
     </div>
 </div>
 
@@ -334,13 +388,13 @@
     <div class="bg-white rounded-[24px] max-w-md w-full p-6 shadow-2xl border border-gray-100">
         <h3 class="text-lg font-bold text-[#1F1F1F] mb-2">Terima pendaftar?</h3>
         <p class="text-xs text-[#707070] leading-relaxed mb-6">
-            Ahmad Tariq Hifzhillah akan dipindahkan dari Lolos Wawancara ke Diterima sebagai anggota KMID.
+            {{ $pendaftar->name }} akan resmi diterima sebagai anggota/staf KMID UGM.
         </p>
         <div class="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
             <button type="button" onclick="closeTerimaModal()" class="px-4 py-2 border border-gray-200 rounded-xl text-xs font-medium text-[#707070] hover:text-[#1F1F1F] hover:bg-gray-50 transition-colors">
                 Batal
             </button>
-            <button type="button" onclick="closeTerimaModal(); alert('Pendaftar berhasil diterima!')" class="px-5 py-2 bg-[#004ADA] hover:bg-[#003bb0] text-white rounded-xl text-xs font-semibold shadow-xs transition-colors">
+            <button type="button" onclick="submitStatus('Diterima')" class="px-5 py-2 bg-[#12B76A] hover:bg-[#0f9f5c] text-white rounded-xl text-xs font-semibold shadow-xs transition-colors">
                 Terima
             </button>
         </div>
@@ -354,13 +408,13 @@
     <div class="bg-white rounded-[24px] max-w-md w-full p-6 shadow-2xl border border-gray-100">
         <h3 class="text-lg font-bold text-[#1F1F1F] mb-2">Tolak pendaftar?</h3>
         <p class="text-xs text-[#707070] leading-relaxed mb-6">
-            Ahmad Tariq Hifzhillah akan dipindahkan ke Tidak Lolos. Pastikan keputusan seleksi sudah final.
+            {{ $pendaftar->name }} akan dipindahkan ke status <strong>Tidak Lolos</strong>.
         </p>
         <div class="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
             <button type="button" onclick="closeTolakModal()" class="px-4 py-2 border border-gray-200 rounded-xl text-xs font-medium text-[#707070] hover:text-[#1F1F1F] hover:bg-gray-50 transition-colors">
                 Batal
             </button>
-            <button type="button" onclick="closeTolakModal(); alert('Pendaftar telah ditolak!')" class="px-5 py-2 bg-[#D92D20] hover:bg-red-700 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors">
+            <button type="button" onclick="submitStatus('Tidak Lolos')" class="px-5 py-2 bg-[#D92D20] hover:bg-red-700 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors">
                 Tolak
             </button>
         </div>
@@ -368,6 +422,25 @@
 </div>
 
 <script>
+    function submitStatus(status) {
+        document.getElementById('input-action-status').value = status;
+        document.getElementById('form-action-status').submit();
+    }
+
+    function openLoloskanModal() {
+        document.getElementById('modal-loloskan').classList.remove('hidden');
+    }
+    function closeLoloskanModal() {
+        document.getElementById('modal-loloskan').classList.add('hidden');
+    }
+
+    function openLolosWawancaraModal() {
+        document.getElementById('modal-lolos-wawancara').classList.remove('hidden');
+    }
+    function closeLolosWawancaraModal() {
+        document.getElementById('modal-lolos-wawancara').classList.add('hidden');
+    }
+
     function openTerimaModal() {
         document.getElementById('modal-terima').classList.remove('hidden');
     }
