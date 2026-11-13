@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PendaftarController;
 use App\Models\User;
 use App\Rules\UgmEmail;
 use Illuminate\Http\Request;
@@ -130,17 +131,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         return redirect()->route('admin.pendaftar.index');
     })->name('dashboard');
 
-    Route::get('/kelola-akun', function () {
-        return view('admin.kelola-akun-pendaftar');
-    })->name('pendaftar.index');
-
-    Route::get('/kelola-akun/detail', function () {
-        return view('admin.detail-pendaftar');
-    })->name('pendaftar.detail');
-
-    Route::get('/kelola-akun/tambah', function () {
-        return view('admin.tambah-pendaftar');
-    })->name('pendaftar.create');
+    Route::get('/kelola-akun', [PendaftarController::class, 'index'])->name('pendaftar.index');
+    Route::get('/kelola-akun/detail', [PendaftarController::class, 'detail'])->name('pendaftar.detail');
+    Route::get('/kelola-akun/tambah', [PendaftarController::class, 'create'])->name('pendaftar.create');
+    Route::post('/kelola-akun/tambah', [PendaftarController::class, 'store'])->name('pendaftar.store');
+    Route::post('/kelola-akun/{pendaftar}/status', [PendaftarController::class, 'updateStatus'])->name('pendaftar.status');
 
     Route::get('/jadwal-wawancara', function () {
         return view('admin.jadwal-wawancara');
@@ -189,17 +184,11 @@ Route::prefix('staff')->name('staff.')->middleware(['auth', 'role:staff'])->grou
         return redirect()->route('staff.pendaftar.index');
     })->name('dashboard');
 
-    Route::get('/kelola-akun', function () {
-        return view('admin.kelola-akun-pendaftar');
-    })->name('pendaftar.index');
-
-    Route::get('/kelola-akun/detail', function () {
-        return view('admin.detail-pendaftar');
-    })->name('pendaftar.detail');
-
-    Route::get('/kelola-akun/tambah', function () {
-        return view('admin.tambah-pendaftar');
-    })->name('pendaftar.create');
+    Route::get('/kelola-akun', [PendaftarController::class, 'index'])->name('pendaftar.index');
+    Route::get('/kelola-akun/detail', [PendaftarController::class, 'detail'])->name('pendaftar.detail');
+    Route::get('/kelola-akun/tambah', [PendaftarController::class, 'create'])->name('pendaftar.create');
+    Route::post('/kelola-akun/tambah', [PendaftarController::class, 'store'])->name('pendaftar.store');
+    Route::post('/kelola-akun/{pendaftar}/status', [PendaftarController::class, 'updateStatus'])->name('pendaftar.status');
 
     Route::get('/jadwal-wawancara', function () {
         return view('admin.jadwal-wawancara');

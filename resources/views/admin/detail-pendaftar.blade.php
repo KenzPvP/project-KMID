@@ -43,13 +43,13 @@
     <!-- Applicant Header Card -->
     <div class="bg-white rounded-[24px] sm:rounded-[28px] p-6 sm:p-8 shadow-[0_10px_35px_rgba(0,0,0,0.03)] border border-gray-100/90 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h2 class="text-xl sm:text-2xl font-bold text-[#1F1F1F]">Ahmad Tariq Hifzhillah</h2>
-            <p class="text-xs sm:text-sm text-[#707070] mt-1">25/512345/SV/22345 · Teknologi Rekayasa Perangkat Lunak</p>
+            <h2 class="text-xl sm:text-2xl font-bold text-[#1F1F1F]">{{ $pendaftar->name ?? 'Ahmad Tariq Hifzhillah' }}</h2>
+            <p class="text-xs sm:text-sm text-[#707070] mt-1">{{ $pendaftar->nim ?? '25/512345/SV/22345' }} · {{ $pendaftar->major ?? 'Teknologi Rekayasa Perangkat Lunak' }}</p>
         </div>
         <div class="sm:text-right">
             <span class="text-xs text-[#707070] block mb-1">Status saat ini</span>
             <span class="inline-block px-3.5 py-1 rounded-full text-xs font-semibold bg-[#EBF2FE] text-[#004ADA] border border-blue-100">
-                Lolos Wawancara
+                {{ $pendaftar->status ?? 'Lolos Wawancara' }}
             </span>
         </div>
     </div>
@@ -68,31 +68,31 @@
                     <!-- Row 1 -->
                     <div>
                         <p class="text-xs text-[#707070] mb-1">Nama lengkap</p>
-                        <p class="font-semibold text-[#1F1F1F]">Ahmad Tariq Hifzhillah</p>
+                        <p class="font-semibold text-[#1F1F1F]">{{ $pendaftar->name ?? 'Ahmad Tariq Hifzhillah' }}</p>
                     </div>
                     <div>
                         <p class="text-xs text-[#707070] mb-1">NIM</p>
-                        <p class="font-semibold text-[#1F1F1F]">25/512345/SV/22345</p>
+                        <p class="font-semibold text-[#1F1F1F]">{{ $pendaftar->nim ?? '25/512345/SV/22345' }}</p>
                     </div>
 
                     <!-- Row 2 -->
                     <div>
                         <p class="text-xs text-[#707070] mb-1">Program studi</p>
-                        <p class="font-semibold text-[#1F1F1F]">Teknologi Rekayasa Perangkat Lunak</p>
+                        <p class="font-semibold text-[#1F1F1F]">{{ $pendaftar->major ?? 'Teknologi Rekayasa Perangkat Lunak' }}</p>
                     </div>
                     <div>
                         <p class="text-xs text-[#707070] mb-1">Email UGM</p>
-                        <p class="font-semibold text-[#1F1F1F]">ahmad.tariq.h@mail.ugm.ac.id</p>
+                        <p class="font-semibold text-[#1F1F1F]">{{ $pendaftar->email ?? 'ahmad.tariq.h@mail.ugm.ac.id' }}</p>
                     </div>
 
                     <!-- Row 3 -->
                     <div>
                         <p class="text-xs text-[#707070] mb-1">No. WhatsApp</p>
-                        <p class="font-semibold text-[#1F1F1F]">0812-3456-7890</p>
+                        <p class="font-semibold text-[#1F1F1F]">{{ $pendaftar->phone_number ?? '0812-3456-7890' }}</p>
                     </div>
                     <div>
                         <p class="text-xs text-[#707070] mb-1">Divisi pilihan</p>
-                        <p class="font-semibold text-[#1F1F1F]">Teknologi</p>
+                        <p class="font-semibold text-[#1F1F1F]">{{ $pendaftar->division ?? 'Teknologi' }}</p>
                     </div>
                 </div>
             </div>
