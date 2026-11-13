@@ -163,7 +163,10 @@
                                 <p class="text-[11px] text-[#707070] mt-1">{{ $pengurus->period }}</p>
                             </td>
                             <td class="py-5 pl-4 align-top text-center">
-                                <div class="flex flex-col items-center gap-2">
+                                <div class="flex flex-col items-center gap-1.5">
+                                    <a href="{{ route('admin.kepengurusan.edit', $pengurus) }}" class="w-16 py-1 text-center border border-gray-200 rounded-lg text-xs font-semibold text-[#004ADA] hover:bg-blue-50 transition-colors inline-block">
+                                        Edit
+                                    </a>
                                     <form method="POST" action="{{ route('admin.kepengurusan.destroy', $pengurus) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data pengurus ini?');">
                                         @csrf
                                         @method('DELETE')

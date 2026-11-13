@@ -107,6 +107,67 @@ class KepengurusanController extends Controller
     }
 
     /**
+     * Tampilkan form edit pengurus.
+     */
+    public function edit(Kepengurusan $pengurus)
+    {
+        return view('admin.edit-kepengurusan', compact('pengurus'));
+    }
+
+    /**
+     * Perbarui data pengurus di database.
+     */
+    public function update(Request $request, Kepengurusan $pengurus)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:150'],
+            'email' => ['nullable', 'string', 'email', 'max:191'],
+            'department' => ['nullable', 'string', 'max:150'],
+            'group' => ['required', 'string', 'max:100'],
+            'position' => ['required', 'string', 'max:100'],
+            'period' => ['required', 'string', 'max:50'],
+            'order' => ['nullable', 'integer', 'min:1'],
+            'status' => ['required', 'string', 'in:Dipublikasikan,Draf'],
+            'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp,svg', 'max:2048'],
+        ], [
+            'name.required' => 'Nama lengkap & gelar wajib diisi.',
+            'group.required' => 'Kelompok struktur wajib dipilih.',
+            'position.required' => 'Jabatan pengurus wajib diisi.',
+            'period.required' => 'Periode kepengurusan wajib diisi.',
+            'status.required' => 'Status publikasi wajib dipilih.',
+            'photo.image' => 'File foto harus berupa gambar (JPEG, PNG, JPG, WEBP, SVG).',
+            'photo.max' => 'Ukuran file foto maksimal 2 MB.',
+        ]);
+
+        if (empty($validated['order'])) {
+            $validated['order'] = $pengurus->order;
+        }
+
+        // Upload foto baru jika ada
+        if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
+            // Hapus foto lama jika ada
+            if ($pengurus->photo_url && file_exists(public_path($pengurus->photo_url))) {
+                @unlink(public_path($pengurus->photo_url));
+            }
+
+            $file = $request->file('photo');
+            $filename = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '', $file->getClientOriginalName());
+            $destinationPath = public_path('uploads/kepengurusan');
+            
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
+            }
+            
+            $file->move($destinationPath, $filename);
+            $validated['photo_url'] = 'uploads/kepengurusan/' . $filename;
+        }
+
+        $pengurus->update($validated);
+
+        return redirect()->route('admin.kepengurusan')->with('success', 'Data pengurus ' . $pengurus->name . ' berhasil diperbarui.');
+    }
+
+    /**
      * Hapus data pengurus.
      */
     public function destroy(Kepengurusan $pengurus)

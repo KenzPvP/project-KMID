@@ -153,6 +153,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/kepengurusan', [KepengurusanController::class, 'index'])->name('kepengurusan');
     Route::get('/kepengurusan/tambah', [KepengurusanController::class, 'create'])->name('kepengurusan.create');
     Route::post('/kepengurusan/tambah', [KepengurusanController::class, 'store'])->name('kepengurusan.store');
+    Route::get('/kepengurusan/{pengurus}/edit', [KepengurusanController::class, 'edit'])->name('kepengurusan.edit');
+    Route::put('/kepengurusan/{pengurus}', [KepengurusanController::class, 'update'])->name('kepengurusan.update');
     Route::delete('/kepengurusan/{pengurus}', [KepengurusanController::class, 'destroy'])->name('kepengurusan.destroy');
 
     Route::get('/galeri-aktivitas', function () {
