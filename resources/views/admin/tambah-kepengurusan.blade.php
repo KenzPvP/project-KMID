@@ -223,6 +223,23 @@
                         <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
+
+                <!-- Akses Akun Login Staff -->
+                <div class="col-span-1 sm:col-span-2 pt-2 border-t border-gray-100">
+                    <label for="password" class="block text-xs font-semibold text-[#1F1F1F] mb-1.5">
+                        Beri akses login Staff (Opsional)
+                    </label>
+                    <input type="text" 
+                           id="password" 
+                           name="password" 
+                           value="{{ old('password') }}" 
+                           placeholder="Masukkan kata sandi jika pengurus ini diberi akses login Staff (min. 8 karakter)" 
+                           class="w-full px-4 py-2.5 bg-white border @error('password') border-red-400 @else border-gray-200 @enderror rounded-xl text-xs sm:text-sm text-[#1F1F1F] focus:outline-none focus:border-[#004ADA] focus:ring-1 focus:ring-[#004ADA]">
+                    <p class="text-[11px] text-[#8E8E93] mt-1">Jika diisi dan memiliki email UGM, sistem otomatis membuat akun dengan peran Staff agar pengurus dapat login ke dashboard pengelolaan.</p>
+                    @error('password')
+                        <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
             <!-- Upload Foto Pengurus -->

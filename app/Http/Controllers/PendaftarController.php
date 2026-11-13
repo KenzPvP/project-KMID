@@ -69,6 +69,8 @@ class PendaftarController extends Controller
             'cv_url' => ['nullable', 'url', 'max:255'],
             'status' => ['nullable', 'string', 'max:50'],
             'motivation' => ['nullable', 'string'],
+            'role' => ['nullable', 'string', 'in:pendaftar,staff'],
+            'password' => ['nullable', 'string', 'min:8'],
         ], [
             'name.required' => 'Nama lengkap wajib diisi.',
             'nim.required' => 'NIM wajib diisi.',
@@ -77,21 +79,46 @@ class PendaftarController extends Controller
             'email.required' => 'Email UGM wajib diisi.',
             'division.required' => 'Divisi pilihan wajib dipilih.',
             'cv_url.url' => 'Format link berkas harus berupa URL yang valid (contoh: https://...).',
+            'password.min' => 'Kata sandi akun minimal 8 karakter.',
         ]);
 
         if (empty($validated['status'])) {
             $validated['status'] = 'Mendaftar';
         }
 
-        $pendaftar = Pendaftar::create($validated);
+        $role = $validated['role'] ?? 'pendaftar';
+        $plainPassword = !empty($validated['password']) ? $validated['password'] : 'password123';
 
-        // Sinkronisasi akun user jika belum ada akun dengan email tersebut
-        if (!User::where('email', $validated['email'])->exists()) {
+        $pendaftar = Pendaftar::create([
+            'name' => $validated['name'],
+            'nim' => $validated['nim'],
+            'major' => $validated['major'],
+            'email' => $validated['email'],
+            'phone_number' => $validated['phone_number'] ?? null,
+            'division' => $validated['division'],
+            'cv_url' => $validated['cv_url'] ?? null,
+            'status' => $validated['status'],
+            'motivation' => $validated['motivation'] ?? null,
+        ]);
+
+        // Buat atau sinkronkan akun User agar bisa langsung login
+        $user = User::where('email', $validated['email'])->first();
+        if ($user) {
+            $user->update([
+                'name' => $validated['name'],
+                'password' => $plainPassword,
+                'role' => $role,
+                'nim' => $validated['nim'],
+                'major' => $validated['major'],
+                'phone_number' => $validated['phone_number'] ?? null,
+                'is_active' => true,
+            ]);
+        } else {
             User::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
-                'password' => 'password123',
-                'role' => 'pendaftar',
+                'password' => $plainPassword,
+                'role' => $role,
                 'nim' => $validated['nim'],
                 'major' => $validated['major'],
                 'phone_number' => $validated['phone_number'] ?? null,
@@ -101,8 +128,9 @@ class PendaftarController extends Controller
 
         $isStaff = $request->is('staff*');
         $redirectRoute = $isStaff ? 'staff.pendaftar.index' : 'admin.pendaftar.index';
+        $roleTitle = $role === 'staff' ? 'Staff' : 'Pendaftar';
 
-        return redirect()->route($redirectRoute)->with('success', 'Pendaftar ' . $pendaftar->name . ' berhasil ditambahkan.');
+        return redirect()->route($redirectRoute)->with('success', "Akun {$roleTitle} '{$pendaftar->name}' berhasil ditambahkan! Akun dapat login menggunakan email '{$pendaftar->email}' dan kata sandi: '{$plainPassword}'.");
     }
 
     /**

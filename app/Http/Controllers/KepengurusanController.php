@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kepengurusan;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class KepengurusanController extends Controller
@@ -102,6 +103,19 @@ class KepengurusanController extends Controller
         }
 
         $pengurus = Kepengurusan::create($validated);
+
+        // Buat akun login Staff jika password diisi dan email tersedia
+        if ($request->filled('password') && !empty($validated['email'])) {
+            User::updateOrCreate(
+                ['email' => $validated['email']],
+                [
+                    'name' => $validated['name'],
+                    'password' => $request->password,
+                    'role' => 'staff',
+                    'is_active' => true,
+                ]
+            );
+        }
 
         return redirect()->route('admin.kepengurusan')->with('success', 'Pengurus ' . $pengurus->name . ' berhasil ditambahkan.');
     }

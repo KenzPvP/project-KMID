@@ -173,6 +173,40 @@
                     <input type="text" id="status" name="status" value="Mendaftar" readonly class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs sm:text-sm text-[#707070] cursor-not-allowed">
                     <p class="text-[11px] text-[#8E8E93] mt-1">Status default untuk pendaftar baru.</p>
                 </div>
+
+                <!-- Col 1: Peran Akun Login -->
+                <div>
+                    <label for="role" class="block text-xs font-semibold text-[#1F1F1F] mb-1.5">
+                        Peran akun login <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <select id="role" name="role" required class="w-full appearance-none bg-white border @error('role') border-red-400 @else border-gray-200 @enderror rounded-xl px-4 py-2.5 pr-8 text-xs sm:text-sm text-[#1F1F1F] focus:outline-none focus:border-[#004ADA] cursor-pointer">
+                            <option value="pendaftar" {{ old('role', 'pendaftar') === 'pendaftar' ? 'selected' : '' }}>Pendaftar (Oprec KMID)</option>
+                            <option value="staff" {{ old('role') === 'staff' ? 'selected' : '' }}>Staff (Akses Kelola Pendaftaran)</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-[#8E8E93] mt-1">Pilih "Staff" agar akun dapat login ke dashboard pengelolaan.</p>
+                    @error('role')
+                        <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Col 2: Kata Sandi Login -->
+                <div>
+                    <label for="password" class="block text-xs font-semibold text-[#1F1F1F] mb-1.5">
+                        Kata sandi login (Password)
+                    </label>
+                    <input type="text" id="password" name="password" value="{{ old('password') }}" placeholder="Default: password123 (min. 8 karakter)" class="w-full px-4 py-2.5 bg-white border @error('password') border-red-400 @else border-gray-200 @enderror rounded-xl text-xs sm:text-sm text-[#1F1F1F] focus:outline-none focus:border-[#004ADA] focus:ring-1 focus:ring-[#004ADA]">
+                    <p class="text-[11px] text-[#8E8E93] mt-1">Kosongkan jika ingin memakai sandi default: <span class="font-mono text-gray-700 bg-gray-100 px-1 py-0.5 rounded">password123</span></p>
+                    @error('password')
+                        <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
             <!-- Full-width Textarea: Motivasi Singkat -->
