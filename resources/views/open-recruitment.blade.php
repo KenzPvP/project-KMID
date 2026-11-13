@@ -227,54 +227,6 @@
                             </div>
                         @endif
 
-                        <!-- Status Tahapan Pendaftaran -->
-                        @if ($isBerkasDiterima)
-                            <div class="mb-7 p-4 sm:p-5 bg-emerald-50/80 border border-emerald-200 rounded-2xl flex items-start gap-3.5">
-                                <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                </div>
-                                <div class="text-xs sm:text-sm flex-1">
-                                    <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-200/60 text-emerald-800 mb-1">Tahap 2: Lolos Berkas (ACC Admin)</span>
-                                    <p class="font-bold text-emerald-950">Selamat! Berkas pendaftaran Anda telah disetujui (ACC) oleh Admin.</p>
-                                    <p class="text-emerald-800 mt-1 leading-relaxed">Menu <strong>Pengisian Jadwal Wawancara</strong> telah aktif di sidebar. Silakan tentukan sesi wawancara Anda.</p>
-                                    <div class="mt-3">
-                                        <button type="button" onclick="switchSection('wawancara')" class="inline-flex items-center gap-1.5 px-4 py-2 bg-[#004ADA] hover:bg-[#003bb0] text-white text-xs font-semibold rounded-xl shadow-xs transition-colors cursor-pointer">
-                                            <span>Buka Pengisian Jadwal Wawancara</span>
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        @elseif ($hasRegistered)
-                            <div class="mb-7 p-4 sm:p-5 bg-amber-50/80 border border-amber-200 rounded-2xl flex items-start gap-3.5">
-                                <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0 mt-0.5">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                </div>
-                                <div class="text-xs sm:text-sm flex-1">
-                                    <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-200/60 text-amber-800 mb-1">Tahap 1: Menunggu ACC Berkas Admin</span>
-                                    <p class="font-bold text-amber-950">Berkas pendaftaran Anda telah terkirim (Status: {{ $pendaftar->status ?? 'Mendaftar' }})</p>
-                                    <p class="text-amber-800 mt-1 leading-relaxed">Admin sedang meninjau berkas pendaftaran Anda. Bagian <strong>Pengisian Jadwal Wawancara</strong> akan otomatis muncul setelah berkas Anda disetujui (Lolos Berkas).</p>
-                                </div>
-                            </div>
-                        @else
-                            <div class="mb-7 p-4 sm:p-5 bg-blue-50/70 border border-blue-200/80 rounded-2xl flex items-start gap-3.5">
-                                <div class="w-9 h-9 rounded-xl bg-blue-100 text-[#004ADA] flex items-center justify-center shrink-0 mt-0.5">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                </div>
-                                <div class="text-xs sm:text-sm flex-1">
-                                    <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-200/60 text-[#004ADA] mb-1">Pendaftaran Baru</span>
-                                    <p class="font-bold text-[#1F1F1F]">Lengkapi Formulir Pendaftaran Oprec Staff KMID</p>
-                                    <p class="text-[#707070] mt-1 leading-relaxed">Silakan lengkapi data diri, pilihan divisi, dan berkas di bawah ini. Setelah berkas dikirim dan disetujui (ACC) oleh Admin, bagian <strong>Pengisian Jadwal Wawancara</strong> akan terbuka.</p>
-                                </div>
-                            </div>
-                        @endif
-
                         <!-- Form Header -->
                         <div class="mb-8">
                             <!-- Small Brand Tag -->
@@ -292,6 +244,49 @@
                             <div class="w-12 h-1 bg-[#FEA515] rounded-full mt-2 mb-3"></div>
                             <!-- Subtitle -->
                             <p class="text-xs sm:text-sm text-[#707070] leading-relaxed">Halo, calon anggota KMID! Lengkapi data diri, pilihan divisi, dan berkasmu melalui formulir di bawah ini.</p>
+
+                            <!-- Status Tahapan Pendaftaran (Simple & Sleek) -->
+                            @if ($isBerkasDiterima)
+                                <div class="mt-5 p-3.5 sm:p-4 bg-emerald-50/80 border border-emerald-200/80 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                                    <div class="flex items-center gap-2.5 text-emerald-950">
+                                        <div class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                            </svg>
+                                        </div>
+                                        <span>
+                                            <strong class="font-bold">Berkas Disetujui (Lolos Berkas)!</strong> Menu wawancara telah dibuka. Silakan pilih jadwal wawancara Anda.
+                                        </span>
+                                    </div>
+                                    <button type="button" onclick="switchSection('wawancara')" class="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 bg-[#004ADA] hover:bg-[#003bb0] text-white font-semibold rounded-lg transition-colors shrink-0 shadow-xs cursor-pointer">
+                                        <span>Isi Jadwal Wawancara</span>
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                    </button>
+                                </div>
+                            @elseif ($hasRegistered)
+                                <div class="mt-5 p-3.5 sm:p-4 bg-amber-50/70 border border-amber-200/70 rounded-xl flex items-center justify-between gap-3 text-xs">
+                                    <div class="flex items-center gap-2.5 text-amber-900">
+                                        <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        <span>
+                                            <strong class="font-semibold text-amber-950">Berkas Terkirim:</strong> Menunggu peninjauan Admin. Bagian jadwal wawancara akan aktif setelah berkas di-ACC.
+                                        </span>
+                                    </div>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-200/70 text-amber-900 shrink-0">
+                                        Status: {{ $pendaftar->status ?? 'Mendaftar' }}
+                                    </span>
+                                </div>
+                            @else
+                                <div class="mt-5 p-3 sm:p-3.5 bg-blue-50/60 border border-blue-100 rounded-xl flex items-center gap-2.5 text-xs text-[#505050]">
+                                    <svg class="w-4 h-4 text-[#004ADA] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <span>
+                                        <strong class="font-semibold text-[#1F1F1F]">Catatan:</strong> Bagian <strong>Pengisian Jadwal Wawancara</strong> akan terbuka otomatis setelah berkas Anda disetujui (ACC) oleh Admin.
+                                    </span>
+                                </div>
+                            @endif
                         </div>
 
                         <!-- Divider line -->
