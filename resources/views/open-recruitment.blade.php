@@ -431,9 +431,16 @@
                                     </div>
                                 </div>
 
-                                <!-- Footer Action with Next -->
-                                <div class="mt-10 flex justify-end">
-                                    <button type="button" id="btn-next-to-c" class="inline-flex items-center justify-center gap-2 px-7 py-3 bg-[#004ADA] hover:bg-[#003FBA] active:scale-[0.99] text-white font-semibold text-sm rounded-xl transition-all duration-200 shadow-md shadow-blue-600/20">
+                                <!-- Footer Action with Back & Next -->
+                                <div class="mt-10 flex items-center justify-between gap-4">
+                                    <button type="button" id="btn-back-to-a" class="inline-flex items-center justify-center gap-2 px-6 py-3 border border-[#E5E7EB] bg-white hover:bg-gray-50 text-[#555555] hover:text-[#1F1F1F] font-semibold text-sm rounded-xl transition-all duration-200 cursor-pointer">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                                        </svg>
+                                        <span>Kembali</span>
+                                    </button>
+
+                                    <button type="button" id="btn-next-to-c" class="inline-flex items-center justify-center gap-2 px-7 py-3 bg-[#004ADA] hover:bg-[#003FBA] active:scale-[0.99] text-white font-semibold text-sm rounded-xl transition-all duration-200 shadow-md shadow-blue-600/20 cursor-pointer">
                                         <span>Selanjutnya</span>
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
@@ -511,15 +518,24 @@
                                 </div>
 
                                 <!-- Footer Action with Note -->
-                                <div class="mt-10 pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                <div class="mt-10 pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[#F3F4F6]">
                                     <p class="text-xs text-[#707070] text-center sm:text-left">Pastikan data dan berkasmu sudah sesuai sebelum mengirim pendaftaran.</p>
                                     
-                                    <button type="submit" id="btn-submit-pendaftaran" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 bg-[#004ADA] hover:bg-[#003FBA] active:scale-[0.99] text-white font-semibold text-sm rounded-xl transition-all duration-200 shadow-md shadow-blue-600/20 cursor-pointer">
-                                        <span>Kirim Pendaftaran</span>
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                                        </svg>
-                                    </button>
+                                    <div class="flex flex-col-reverse sm:flex-row items-center gap-3 w-full sm:w-auto">
+                                        <button type="button" id="btn-back-to-b" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 border border-[#E5E7EB] bg-white hover:bg-gray-50 text-[#555555] hover:text-[#1F1F1F] font-semibold text-sm rounded-xl transition-all duration-200 cursor-pointer">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                                            </svg>
+                                            <span>Kembali</span>
+                                        </button>
+
+                                        <button type="submit" id="btn-submit-pendaftaran" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 bg-[#004ADA] hover:bg-[#003FBA] active:scale-[0.99] text-white font-semibold text-sm rounded-xl transition-all duration-200 shadow-md shadow-blue-600/20 cursor-pointer">
+                                            <span>{{ $hasRegistered ? 'Simpan & Perbarui Berkas' : 'Kirim Pendaftaran' }}</span>
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </form>
@@ -533,6 +549,16 @@
                 <section id="section-wawancara" class="portal-section w-full max-w-[880px] relative z-10 hidden">
                     <div class="bg-white rounded-[24px] sm:rounded-[28px] p-6 sm:p-10 lg:p-12 shadow-[0_10px_35px_rgba(0,0,0,0.03)] border border-gray-100/80">
                         
+                        <!-- Top Navigation Back Button -->
+                        <div class="mb-5">
+                            <button type="button" onclick="switchSection('pendaftaran')" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-xs font-semibold text-[#555555] hover:text-[#004ADA] transition-colors cursor-pointer group shadow-2xs">
+                                <svg class="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                                </svg>
+                                <span>Kembali ke Formulir Berkas</span>
+                            </button>
+                        </div>
+
                         <!-- Form Header -->
                         <div class="mb-8">
                             <!-- Small Brand Tag -->
@@ -648,15 +674,24 @@
                             </div>
 
                             <!-- Footer Action with Note -->
-                            <div class="mt-10 pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <div class="mt-10 pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[#F3F4F6]">
                                 <p class="text-xs text-[#707070] text-center sm:text-left">Pastikan sesi yang dipilih sudah sesuai sebelum mengirim jadwal wawancara.</p>
                                 
-                                <button type="submit" id="btn-submit-wawancara" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 bg-[#004ADA] hover:bg-[#003FBA] active:scale-[0.99] text-white font-semibold text-sm rounded-xl transition-all duration-200 shadow-md shadow-blue-600/20 cursor-pointer">
-                                    <span>Konfirmasi Jadwal Wawancara</span>
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                                    </svg>
-                                </button>
+                                <div class="flex flex-col-reverse sm:flex-row items-center gap-3 w-full sm:w-auto">
+                                    <button type="button" onclick="switchSection('pendaftaran')" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 border border-[#E5E7EB] bg-white hover:bg-gray-50 text-[#555555] hover:text-[#1F1F1F] font-semibold text-sm rounded-xl transition-all duration-200 cursor-pointer shadow-xs">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                                        </svg>
+                                        <span>Kembali</span>
+                                    </button>
+
+                                    <button type="submit" id="btn-submit-wawancara" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 bg-[#004ADA] hover:bg-[#003FBA] active:scale-[0.99] text-white font-semibold text-sm rounded-xl transition-all duration-200 shadow-md shadow-blue-600/20 cursor-pointer">
+                                        <span>Konfirmasi Jadwal Wawancara</span>
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -692,6 +727,7 @@
 
                     if (sectionPendaftaran) sectionPendaftaran.classList.add('hidden');
                     sectionWawancara.classList.remove('hidden');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 } else if (sectionPendaftaran) {
                     if (navBtnPendaftaran) {
                         navBtnPendaftaran.classList.remove('text-[#707070]', 'hover:bg-slate-50', 'hover:text-[#1F1F1F]');
@@ -707,6 +743,7 @@
 
                     if (sectionWawancara) sectionWawancara.classList.add('hidden');
                     sectionPendaftaran.classList.remove('hidden');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
             };
 
