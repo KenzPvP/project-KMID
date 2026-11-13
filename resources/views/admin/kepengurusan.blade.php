@@ -1,4 +1,5 @@
 @extends('layouts.admin')
+@section('show_content_management', true)
 
 @section('title', 'Admin KMID - Kepengurusan')
 @section('topbar_breadcrumb', 'Admin KMID / Kepengurusan')
