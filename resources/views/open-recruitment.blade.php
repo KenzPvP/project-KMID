@@ -657,14 +657,14 @@
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <!-- 2. Divisi yang Lolos -->
                                         <div>
-                                            <label for="wawancara_divisi" class="block text-sm font-semibold text-[#1F1F1F] mb-1.5">2. Divisi yang Lolos <span class="text-red-500">*</span></label>
-                                            <input type="text" id="wawancara_divisi" name="divisi" value="{{ old('divisi', $pendaftar->division ?? 'Media Creative') }}" required placeholder="Masukkan divisi" class="w-full px-4 py-3 bg-[#FBFBFA] border border-[#E5E7EB] rounded-xl text-sm text-[#1F1F1F] placeholder-[#9CA3AF] focus:outline-none focus:bg-white focus:border-[#004ADA] focus:ring-2 focus:ring-blue-100 transition-all">
+                                            <label for="wawancara_divisi" class="block text-sm font-semibold text-[#1F1F1F] mb-1.5">2. Divisi yang Lolos</label>
+                                            <input type="text" id="wawancara_divisi" name="divisi" value="{{ $pendaftar->division ?? 'Media Creative' }}" readonly class="w-full px-4 py-3 bg-[#F3F4F6] border border-[#E5E7EB] rounded-xl text-sm text-[#555555] font-medium cursor-not-allowed select-none focus:outline-none">
                                         </div>
 
                                         <!-- 3. Hari Wawancara -->
                                         <div>
                                             <label for="input_hari_wawancara" class="block text-sm font-semibold text-[#1F1F1F] mb-1.5">3. Hari Wawancara</label>
-                                            <input type="text" id="input_hari_wawancara" name="tanggal_wawancara" value="{{ old('tanggal_wawancara', $pendaftar->interview_date ?? '') }}" placeholder="Pilih sesi di bawah atau isi tanggal" class="w-full px-4 py-3 bg-[#FBFBFA] border border-[#E5E7EB] rounded-xl text-sm text-[#1F1F1F] placeholder-[#9CA3AF] focus:outline-none focus:bg-white focus:border-[#004ADA] focus:ring-2 focus:ring-blue-100 transition-all">
+                                            <input type="text" id="input_hari_wawancara" name="tanggal_wawancara" value="{{ $pendaftar->interview_date ?? 'Pilih sesi jam di bawah' }}" readonly class="w-full px-4 py-3 bg-[#F3F4F6] border border-[#E5E7EB] rounded-xl text-sm text-[#555555] font-medium cursor-not-allowed select-none focus:outline-none">
                                         </div>
                                     </div>
                                 </div>
