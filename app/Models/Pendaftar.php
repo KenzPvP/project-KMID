@@ -19,6 +19,7 @@ class Pendaftar extends Model
         'phone_number',
         'division',
         'cv_url',
+        'portfolio_url',
         'status',
         'motivation',
         'interview_date',

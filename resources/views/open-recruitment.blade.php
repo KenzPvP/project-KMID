@@ -2,6 +2,20 @@
     $isBerkasDiterima = $pendaftar && in_array($pendaftar->status, ['Lolos Berkas', 'Lolos Wawancara', 'Diterima']);
     $hasRegistered = !empty($pendaftar);
     $activeTab = request('tab', ($isBerkasDiterima ? 'wawancara' : 'pendaftaran'));
+
+    // Tentukan langkah awal formulir pendaftaran
+    $initialStep = 'a';
+    if (isset($errors) && $errors->any()) {
+        if ($errors->has('file_cv') || $errors->has('file_porto') || $errors->has('no_whatsapp')) {
+            $initialStep = 'c';
+        } elseif ($errors->has('divisi_pertama') || $errors->has('alasan_divisi_pertama') || $errors->has('divisi_kedua') || $errors->has('alasan_divisi_2')) {
+            $initialStep = 'b';
+        }
+    } elseif (request('step') === 'c') {
+        $initialStep = 'c';
+    } elseif (request('step') === 'b') {
+        $initialStep = 'b';
+    }
 @endphp
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
@@ -300,7 +314,7 @@
                             <!-- ========================================== -->
                             <!-- STEP A: DATA DIRI                          -->
                             <!-- ========================================== -->
-                            <div id="step-a" class="oprec-step">
+                            <div id="step-a" class="oprec-step {{ $initialStep === 'a' ? '' : 'hidden' }}">
                                 <!-- Section Category Header -->
                                 <div class="flex items-start gap-3.5 mb-6">
                                     <div class="w-8 h-8 rounded-lg bg-[#FEF4E6] text-[#FEA515] font-bold text-sm flex items-center justify-center shrink-0">
@@ -349,7 +363,7 @@
                             <!-- ========================================== -->
                             <!-- STEP B: PILIHAN DIVISI                     -->
                             <!-- ========================================== -->
-                            <div id="step-b" class="oprec-step hidden">
+                            <div id="step-b" class="oprec-step {{ $initialStep === 'b' ? '' : 'hidden' }}">
                                 <!-- Section Category Header -->
                                 <div class="flex items-start gap-3.5 mb-6">
                                     <div class="w-8 h-8 rounded-lg bg-[#FEF4E6] text-[#FEA515] font-bold text-sm flex items-center justify-center shrink-0">
@@ -453,7 +467,7 @@
                             <!-- ========================================== -->
                             <!-- STEP C: BERKAS & KONTAK                    -->
                             <!-- ========================================== -->
-                            <div id="step-c" class="oprec-step hidden">
+                            <div id="step-c" class="oprec-step {{ $initialStep === 'c' ? '' : 'hidden' }}">
                                 <!-- Section Category Header -->
                                 <div class="flex items-start gap-3.5 mb-6">
                                     <div class="w-8 h-8 rounded-lg bg-[#FEF4E6] text-[#FEA515] font-bold text-sm flex items-center justify-center shrink-0">
@@ -468,53 +482,84 @@
                                 <div class="space-y-6">
                                     <!-- Field 8: Upload CV -->
                                     <div>
-                                        <label class="block text-sm font-semibold text-[#1F1F1F] mb-2">8. Upload CV</label>
+                                        <div class="flex items-center justify-between mb-2">
+                                            <label class="block text-sm font-semibold text-[#1F1F1F]">8. Upload CV <span class="text-red-500">*</span></label>
+                                            <span class="text-[11px] text-[#707070]">PDF / DOC / DOCX (Maks. 10MB)</span>
+                                        </div>
                                         <div id="cv-dropzone" class="border border-dashed border-[#CBD5E1] rounded-2xl p-6 sm:p-7 bg-[#F8FAFC]/50 hover:bg-blue-50/20 hover:border-[#004ADA] transition-all cursor-pointer text-center relative group">
-                                            <input type="file" id="file_cv" name="file_cv" class="sr-only" accept=".pdf,.doc,.docx">
+                                            <input type="file" id="file_cv" name="file_cv" class="sr-only" accept=".pdf,.doc,.docx" {{ $hasRegistered && !empty($pendaftar->cv_url) ? '' : 'required' }}>
                                             <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
                                                 <div class="w-10 h-10 rounded-full bg-blue-50 text-[#004ADA] flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                                                     </svg>
                                                 </div>
-                                                <div class="text-left text-center sm:text-left">
+                                                <div class="text-center sm:text-left">
                                                     <p class="text-xs sm:text-sm text-[#1F1F1F]">
                                                         <span class="text-[#004ADA] font-semibold underline decoration-blue-200">Klik untuk upload</span> atau seret berkas ke sini
                                                     </p>
-                                                    <p id="cv-filename" class="text-xs text-[#9CA3AF] mt-0.5">Belum ada berkas dipilih</p>
+                                                    @if($hasRegistered && !empty($pendaftar->cv_url))
+                                                        <p id="cv-filename" class="text-xs text-emerald-600 font-semibold mt-0.5 flex items-center justify-center sm:justify-start gap-1">
+                                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                                            <span>Berkas tersimpan: <a href="{{ asset($pendaftar->cv_url) }}" target="_blank" class="underline hover:text-emerald-800" onclick="event.stopPropagation()">{{ basename($pendaftar->cv_url) }}</a></span>
+                                                        </p>
+                                                        <p class="text-[11px] text-[#9CA3AF] mt-0.5">Unggah berkas baru hanya jika ingin menggantinya.</p>
+                                                    @else
+                                                        <p id="cv-filename" class="text-xs text-[#9CA3AF] mt-0.5">Belum ada berkas dipilih</p>
+                                                    @endif
                                                 </div>
                                             </div>
                                         </div>
+                                        @error('file_cv')
+                                            <p class="text-xs text-red-600 mt-1.5 font-medium">{{ $message }}</p>
+                                        @enderror
                                     </div>
 
                                     <!-- Field 9: Upload Portofolio -->
                                     <div>
-                                        <div class="mb-2">
-                                            <label class="block text-sm font-semibold text-[#1F1F1F]">9. Upload Portofolio</label>
-                                            <p class="text-xs text-[#707070] mt-0.5">Dikhususkan bagi yang memilih divisi Media Creative.</p>
+                                        <div class="flex items-center justify-between mb-2">
+                                            <div>
+                                                <label class="block text-sm font-semibold text-[#1F1F1F]">9. Upload Portofolio</label>
+                                                <p class="text-xs text-[#707070] mt-0.5">Dikhususkan bagi yang memilih divisi Media Creative (Opsional untuk divisi lain).</p>
+                                            </div>
+                                            <span class="text-[11px] text-[#707070] text-right">PDF / ZIP / RAR / Gambar (Maks. 20MB)</span>
                                         </div>
                                         <div id="porto-dropzone" class="border border-dashed border-[#CBD5E1] rounded-2xl p-6 sm:p-7 bg-[#F8FAFC]/50 hover:bg-blue-50/20 hover:border-[#004ADA] transition-all cursor-pointer text-center relative group">
-                                            <input type="file" id="file_porto" name="file_porto" class="sr-only" accept=".pdf,.zip,.rar">
+                                            <input type="file" id="file_porto" name="file_porto" class="sr-only" accept=".pdf,.zip,.rar,.png,.jpg,.jpeg">
                                             <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
                                                 <div class="w-10 h-10 rounded-full bg-blue-50 text-[#004ADA] flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                                                     </svg>
                                                 </div>
-                                                <div class="text-left text-center sm:text-left">
+                                                <div class="text-center sm:text-left">
                                                     <p class="text-xs sm:text-sm text-[#1F1F1F]">
                                                         <span class="text-[#004ADA] font-semibold underline decoration-blue-200">Klik untuk upload</span> atau seret berkas ke sini
                                                     </p>
-                                                    <p id="porto-filename" class="text-xs text-[#9CA3AF] mt-0.5">Belum ada berkas dipilih</p>
+                                                    @if($hasRegistered && !empty($pendaftar->portfolio_url))
+                                                        <p id="porto-filename" class="text-xs text-emerald-600 font-semibold mt-0.5 flex items-center justify-center sm:justify-start gap-1">
+                                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                                            <span>Berkas tersimpan: <a href="{{ asset($pendaftar->portfolio_url) }}" target="_blank" class="underline hover:text-emerald-800" onclick="event.stopPropagation()">{{ basename($pendaftar->portfolio_url) }}</a></span>
+                                                        </p>
+                                                        <p class="text-[11px] text-[#9CA3AF] mt-0.5">Unggah berkas baru hanya jika ingin menggantinya.</p>
+                                                    @else
+                                                        <p id="porto-filename" class="text-xs text-[#9CA3AF] mt-0.5">Belum ada berkas dipilih</p>
+                                                    @endif
                                                 </div>
                                             </div>
                                         </div>
+                                        @error('file_porto')
+                                            <p class="text-xs text-red-600 mt-1.5 font-medium">{{ $message }}</p>
+                                        @enderror
                                     </div>
 
                                     <!-- Field 10: Nomor WhatsApp -->
                                     <div>
-                                        <label for="no_whatsapp" class="block text-sm font-semibold text-[#1F1F1F] mb-2">10. Nomor WhatsApp</label>
+                                        <label for="no_whatsapp" class="block text-sm font-semibold text-[#1F1F1F] mb-2">10. Nomor WhatsApp <span class="text-red-500">*</span></label>
                                         <input type="tel" id="no_whatsapp" name="no_whatsapp" value="{{ old('no_whatsapp', $pendaftar->phone_number ?? '') }}" required placeholder="Contoh: 0812-3456-7890" class="w-full px-4 py-3 bg-[#FBFBFA] border border-[#E5E7EB] rounded-xl text-sm text-[#1F1F1F] placeholder-[#9CA3AF] focus:outline-none focus:bg-white focus:border-[#004ADA] focus:ring-2 focus:ring-blue-100 transition-all">
+                                        @error('no_whatsapp')
+                                            <p class="text-xs text-red-600 mt-1.5 font-medium">{{ $message }}</p>
+                                        @enderror
                                     </div>
                                 </div>
 
@@ -925,26 +970,57 @@
             });
 
             // File Upload Dropzones
-            function setupDropzone(dropzoneId, inputId, labelId) {
+            function setupDropzone(dropzoneId, inputId, labelId, maxMB, allowedExts) {
                 const dropzone = document.getElementById(dropzoneId);
                 const input = document.getElementById(inputId);
                 const label = document.getElementById(labelId);
 
                 if (!dropzone || !input || !label) return;
 
+                // Stop propagation on input click to prevent double dialog popup
+                input.addEventListener('click', (e) => e.stopPropagation());
+
                 dropzone.addEventListener('click', () => input.click());
+
+                function handleFile(file) {
+                    if (!file) return false;
+
+                    // Extension check
+                    const parts = file.name.split('.');
+                    const ext = parts.length > 1 ? parts.pop().toLowerCase() : '';
+                    if (allowedExts && allowedExts.length && !allowedExts.includes(ext)) {
+                        alert(`Format berkas "${file.name}" tidak didukung.\nFormat yang diperbolehkan: ${allowedExts.join(', ').toUpperCase()}`);
+                        input.value = '';
+                        return false;
+                    }
+
+                    // Size check
+                    const maxBytes = maxMB * 1024 * 1024;
+                    if (file.size > maxBytes) {
+                        alert(`Ukuran berkas "${file.name}" terlalu besar (${(file.size / (1024 * 1024)).toFixed(2)} MB).\nBatas maksimum adalah ${maxMB} MB.`);
+                        input.value = '';
+                        return false;
+                    }
+
+                    const sizeStr = file.size > 1024 * 1024 
+                        ? (file.size / (1024 * 1024)).toFixed(2) + ' MB'
+                        : (file.size / 1024).toFixed(1) + ' KB';
+
+                    label.innerHTML = `<span class="inline-flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span class="break-all font-semibold text-[#004ADA]">${file.name} (${sizeStr})</span></span>`;
+                    label.classList.remove('text-[#9CA3AF]');
+                    return true;
+                }
 
                 input.addEventListener('change', () => {
                     if (input.files && input.files[0]) {
-                        label.textContent = input.files[0].name + ' (' + (input.files[0].size / 1024).toFixed(1) + ' KB)';
-                        label.classList.remove('text-[#9CA3AF]');
-                        label.classList.add('text-[#004ADA]', 'font-semibold');
+                        handleFile(input.files[0]);
                     }
                 });
 
                 ['dragenter', 'dragover'].forEach(eventName => {
                     dropzone.addEventListener(eventName, (e) => {
                         e.preventDefault();
+                        e.stopPropagation();
                         dropzone.classList.add('border-[#004ADA]', 'bg-blue-50/30');
                     });
                 });
@@ -952,22 +1028,40 @@
                 ['dragleave', 'drop'].forEach(eventName => {
                     dropzone.addEventListener(eventName, (e) => {
                         e.preventDefault();
+                        e.stopPropagation();
                         dropzone.classList.remove('border-[#004ADA]', 'bg-blue-50/30');
                     });
                 });
 
                 dropzone.addEventListener('drop', (e) => {
                     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                        input.files = e.dataTransfer.files;
-                        label.textContent = input.files[0].name + ' (' + (input.files[0].size / 1024).toFixed(1) + ' KB)';
-                        label.classList.remove('text-[#9CA3AF]');
-                        label.classList.add('text-[#004ADA]', 'font-semibold');
+                        const file = e.dataTransfer.files[0];
+                        if (handleFile(file)) {
+                            input.files = e.dataTransfer.files;
+                        }
                     }
                 });
             }
 
-            setupDropzone('cv-dropzone', 'file_cv', 'cv-filename');
-            setupDropzone('porto-dropzone', 'file_porto', 'porto-filename');
+            setupDropzone('cv-dropzone', 'file_cv', 'cv-filename', 10, ['pdf', 'doc', 'docx']);
+            setupDropzone('porto-dropzone', 'file_porto', 'porto-filename', 20, ['pdf', 'zip', 'rar', 'png', 'jpg', 'jpeg']);
+
+            // Form Submit Loading Feedback
+            const formOprec = document.getElementById('form-oprec');
+            const btnSubmit = document.getElementById('btn-submit-pendaftaran');
+            if (formOprec && btnSubmit) {
+                formOprec.addEventListener('submit', () => {
+                    btnSubmit.disabled = true;
+                    btnSubmit.classList.add('opacity-75', 'cursor-not-allowed');
+                    btnSubmit.innerHTML = `
+                        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span>Mengunggah Berkas...</span>
+                    `;
+                });
+            }
 
             // Profile Dropdown Toggle
             const profileBtn = document.getElementById('profile-dropdown-btn');

@@ -166,13 +166,20 @@ Route::post('/open-recruitment', function (Request $request) {
         'divisi_pertama' => ['required', 'string', 'max:100'],
         'alasan_divisi_pertama' => ['nullable', 'string'],
         'no_whatsapp' => ['nullable', 'string', 'max:30'],
-        'file_cv' => ['nullable', 'file', 'mimes:pdf,doc,docx', 'max:5120'],
-        'file_porto' => ['nullable', 'file', 'mimes:pdf,zip,rar', 'max:10240'],
+        'file_cv' => ['nullable', 'file', 'mimes:pdf,doc,docx', 'max:10240'],
+        'file_porto' => ['nullable', 'file', 'mimes:pdf,zip,rar,png,jpg,jpeg', 'max:20480'],
     ], [
         'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
         'nim.required' => 'NIM wajib diisi.',
         'asal_prodi.required' => 'Asal program studi wajib diisi.',
         'divisi_pertama.required' => 'Pilihan divisi pertama wajib dipilih.',
+        'file_cv.file' => 'Berkas CV harus berupa file yang valid.',
+        'file_cv.mimes' => 'Format berkas CV harus berupa PDF, DOC, atau DOCX.',
+        'file_cv.max' => 'Ukuran berkas CV maksimal 10 MB.',
+        'file_porto.file' => 'Berkas Portofolio harus berupa file yang valid.',
+        'file_porto.mimes' => 'Format berkas Portofolio harus berupa PDF, ZIP, RAR, PNG, JPG, atau JPEG.',
+        'file_porto.max' => 'Ukuran berkas Portofolio maksimal 20 MB.',
+        'no_whatsapp.max' => 'Nomor WhatsApp maksimal 30 karakter.',
     ]);
 
     $user = Auth::user();
@@ -188,6 +195,18 @@ Route::post('/open-recruitment', function (Request $request) {
         $cvPath = 'uploads/cv/' . $filename;
     }
 
+    $portoPath = null;
+    if ($request->hasFile('file_porto') && $request->file('file_porto')->isValid()) {
+        $file = $request->file('file_porto');
+        $filename = 'porto_' . time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '', $file->getClientOriginalName());
+        $destination = public_path('uploads/portfolio');
+        if (!file_exists($destination)) {
+            mkdir($destination, 0755, true);
+        }
+        $file->move($destination, $filename);
+        $portoPath = 'uploads/portfolio/' . $filename;
+    }
+
     $data = [
         'name' => $validated['nama_lengkap'],
         'nim' => $validated['nim'],
@@ -198,6 +217,9 @@ Route::post('/open-recruitment', function (Request $request) {
     ];
     if ($cvPath) {
         $data['cv_url'] = $cvPath;
+    }
+    if ($portoPath) {
+        $data['portfolio_url'] = $portoPath;
     }
 
     $existing = \App\Models\Pendaftar::where('email', $user->email)->first();

@@ -149,13 +149,22 @@
                                 </svg>
                             </div>
                             <div class="min-w-0 flex-1">
-                                <span class="text-xs font-bold text-[#1F1F1F] block">Divisi &amp; Portofolio</span>
-                                <p class="text-xs font-semibold text-[#1F1F1F] truncate mt-0.5">{{ $pendaftar->division ?? 'Media Creative' }}</p>
-                                <p class="text-[11px] text-[#707070]">Pilihan divisi pendaftar</p>
+                                <span class="text-xs font-bold text-[#1F1F1F] block">Portofolio</span>
+                                <p class="text-xs font-semibold text-[#1F1F1F] truncate mt-0.5">
+                                    {{ !empty($pendaftar->portfolio_url) ? basename($pendaftar->portfolio_url) : 'Belum diunggah' }}
+                                </p>
+                                <p class="text-[11px] text-[#707070]">Berkas Karya / Pendukung</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-2 mt-4 pt-3 border-t border-gray-200/60">
-                            <span class="text-xs font-medium text-[#707070]">Sesuai formulir pendaftaran</span>
+                            @if(!empty($pendaftar->portfolio_url))
+                                <a href="{{ asset($pendaftar->portfolio_url) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-medium text-[#FEA515] hover:bg-amber-50/50 transition-colors">
+                                    <span>Lihat Berkas</span>
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                </a>
+                            @else
+                                <span class="text-xs text-gray-400">Tidak ada berkas portofolio</span>
+                            @endif
                         </div>
                     </div>
                 </div>

@@ -22,4 +22,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        $exceptions->render(function (\Illuminate\Http\Exceptions\PostTooLargeException $e, Request $request) {
+            return back()->withErrors([
+                'file_cv' => 'Ukuran total berkas yang Anda unggah terlalu besar melebihi batas server. Silakan gunakan berkas yang lebih kecil atau kompres terlebih dahulu.',
+            ])->withInput();
+        });
     })->create();
