@@ -452,17 +452,27 @@
 
         btnGenerate.addEventListener('click', generateSlots);
 
+        // Auto-regenerate preview when parameters change
+        [inputTanggal, inputPewawancara, inputJamMulai, inputJamSelesai, inputDurasi, inputKuota, inputMode, inputLokasi].forEach(el => {
+            el?.addEventListener('change', generateSlots);
+        });
+
         // Initial generation on page load for seamless UX
         generateSlots();
 
         // Submit handler feedback
         formTambah.addEventListener('submit', (e) => {
-            if (generatedSlots.length === 0) {
+            if (!generatedSlots || generatedSlots.length === 0) {
+                generateSlots();
+            }
+            if (!generatedSlots || generatedSlots.length === 0) {
                 e.preventDefault();
-                alert('Belum ada slot yang digenerate. Silakan klik "Generate slot otomatis".');
+                alert('Belum ada slot wawancara yang siap disimpan. Pastikan jam selesai lebih besar dari jam mulai dan klik "Generate slot otomatis".');
                 return;
             }
-            btnSubmit.disabled = true;
+
+            inputSlotsJson.value = JSON.stringify(generatedSlots);
+
             btnSubmit.classList.add('opacity-75', 'cursor-not-allowed');
             btnSubmit.innerHTML = `
                 <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" fill="none" viewBox="0 0 24 24">
@@ -471,6 +481,11 @@
                 </svg>
                 <span>Menyimpan ${generatedSlots.length} slot...</span>
             `;
+
+            // Use timeout so form dispatch is not canceled by immediate button disabling
+            setTimeout(() => {
+                btnSubmit.disabled = true;
+            }, 100);
         });
     });
 </script>

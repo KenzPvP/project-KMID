@@ -135,20 +135,35 @@ Route::get('/open-recruitment', function () {
     }
 
     $user = Auth::user();
-    $pendaftar = \App\Models\Pendaftar::where('email', $user->email)->first();
-    $availableSlots = \App\Models\JadwalWawancara::where('status', 'Tersedia')
-        ->orderBy('tanggal', 'asc')
-        ->orderBy('jam_mulai', 'asc')
-        ->get();
+    $pendaftar = \App\Models\Pendaftar::where('email', $user->email)
+        ->orWhere('name', $user->name)
+        ->first();
 
-    return view('open-recruitment', compact('pendaftar', 'availableSlots'));
+    $availableSlots = \App\Models\JadwalWawancara::where(function($q) use ($pendaftar) {
+        $q->where('status', 'Tersedia');
+        if ($pendaftar) {
+            $q->orWhere('pendaftar_id', $pendaftar->id);
+        }
+    })
+    ->orderBy('tanggal', 'asc')
+    ->orderBy('jam_mulai', 'asc')
+    ->get();
+
+    $slotsByDate = $availableSlots->groupBy(function($slot) {
+        return $slot->tanggal ? $slot->tanggal->format('Y-m-d') : 'unknown';
+    });
+
+    return view('open-recruitment', compact('pendaftar', 'availableSlots', 'slotsByDate'));
 })->name('open-recruitment');
 
 Route::get('/open-recruitment/check-status', function () {
     if (!Auth::check()) {
         return response()->json(['error' => 'Unauthenticated'], 401);
     }
-    $pendaftar = \App\Models\Pendaftar::where('email', Auth::user()->email)->first();
+    $user = Auth::user();
+    $pendaftar = \App\Models\Pendaftar::where('email', $user->email)
+        ->orWhere('name', $user->name)
+        ->first();
     $status = $pendaftar->status ?? null;
     $isBerkasDiterima = $pendaftar && in_array($status, ['Lolos Berkas', 'Lolos Wawancara', 'Diterima']);
 
@@ -156,6 +171,8 @@ Route::get('/open-recruitment/check-status', function () {
         'hasRegistered' => !empty($pendaftar),
         'status' => $status,
         'isBerkasDiterima' => $isBerkasDiterima,
+        'interview_date' => $pendaftar->interview_date ?? null,
+        'interview_time' => $pendaftar->interview_time ?? null,
     ]);
 })->name('open-recruitment.check-status');
 
@@ -251,7 +268,9 @@ Route::post('/open-recruitment/jadwal-wawancara', function (Request $request) {
     ]);
 
     $user = Auth::user();
-    $pendaftar = \App\Models\Pendaftar::where('email', $user->email)->first();
+    $pendaftar = \App\Models\Pendaftar::where('email', $user->email)
+        ->orWhere('name', $user->name)
+        ->first();
     if ($pendaftar) {
         $updateData = [];
         if ($request->filled('nama_lengkap')) {

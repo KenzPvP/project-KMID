@@ -692,52 +692,79 @@
 
                                 <input type="hidden" name="jadwal_id" id="selected_jadwal_id" value="">
 
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="group-sesi-wawancara">
+                                <div id="group-sesi-wawancara" class="space-y-6">
                                     @if($hasCustomSlots)
-                                        @foreach($availableSlots as $slot)
+                                        @foreach($slotsByDate as $dateKey => $slotsOnDate)
                                             @php
-                                                $slotTimeLabel = $slot->jam_range;
-                                                $isSelected = ($currentSesi === $slotTimeLabel || ($pendaftar && $pendaftar->id === $slot->pendaftar_id));
+                                                $carbonDate = \Carbon\Carbon::parse($dateKey)->locale('id');
+                                                $formattedHeading = $carbonDate->isoFormat('dddd, D MMMM Y');
+                                                $availableCount = $slotsOnDate->where('status', 'Tersedia')->count();
                                             @endphp
-                                            <label class="sesi-card relative flex items-center gap-3 px-4 py-3.5 rounded-xl cursor-pointer transition-all select-none border {{ $isSelected ? 'border-[#004ADA] bg-[#EBF2FE]' : 'border-[#E5E7EB] bg-[#FBFBFA] hover:bg-white' }}">
-                                                <input type="radio" name="jam_wawancara" value="{{ $slotTimeLabel }}" data-jadwal-id="{{ $slot->id }}" data-tanggal="{{ $slot->tanggal_pendek }}" class="sr-only sesi-radio" {{ $isSelected ? 'checked' : '' }}>
-                                                <span class="custom-radio-circle w-4 h-4 rounded-full border {{ $isSelected ? 'border-[#004ADA]' : 'border-gray-300' }} flex items-center justify-center shrink-0">
-                                                    <span class="radio-dot w-2 h-2 rounded-full bg-[#004ADA] {{ $isSelected ? '' : 'hidden' }}"></span>
-                                                </span>
-                                                <div class="flex-1 min-w-0">
-                                                    <div class="text-xs sm:text-sm font-semibold {{ $isSelected ? 'text-[#004ADA]' : 'text-[#1F1F1F]' }} sesi-time">{{ $slotTimeLabel }}</div>
-                                                    <div class="text-[11px] text-[#707070] flex items-center gap-2 mt-0.5">
-                                                        <span>{{ $slot->tanggal_pendek }}</span>
-                                                        <span>·</span>
-                                                        <span class="font-medium text-[#004ADA]">{{ $slot->mode }}</span>
+                                            <div class="border border-gray-100 rounded-2xl p-4 sm:p-5 bg-slate-50/50">
+                                                <div class="flex items-center justify-between mb-3.5 pb-2.5 border-b border-gray-100">
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="w-6 h-6 rounded-lg bg-blue-100 text-[#004ADA] flex items-center justify-center">
+                                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                                        </span>
+                                                        <h4 class="text-xs sm:text-sm font-bold text-[#1F1F1F]">{{ $formattedHeading }}</h4>
                                                     </div>
+                                                    <span class="text-[11px] font-medium px-2.5 py-0.5 rounded-full {{ $availableCount > 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-gray-100 text-gray-500' }}">
+                                                        {{ $availableCount }} sesi tersedia
+                                                    </span>
                                                 </div>
-                                            </label>
+
+                                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                    @foreach($slotsOnDate as $slot)
+                                                        @php
+                                                            $slotTimeLabel = $slot->jam_range;
+                                                            $isMySlot = ($pendaftar && $pendaftar->id === $slot->pendaftar_id);
+                                                            $isAvailable = ($slot->status === 'Tersedia' || $isMySlot);
+                                                            $isSelected = ($currentSesi === $slotTimeLabel || $isMySlot);
+                                                        @endphp
+
+                                                        @if($isAvailable)
+                                                            <label class="sesi-card relative flex items-start gap-3 p-3.5 rounded-xl cursor-pointer transition-all select-none border {{ $isSelected ? 'border-[#004ADA] bg-[#EBF2FE]' : 'border-[#E5E7EB] bg-white hover:border-blue-200 hover:shadow-xs' }}">
+                                                                <input type="radio" name="jam_wawancara" value="{{ $slotTimeLabel }}" data-jadwal-id="{{ $slot->id }}" data-tanggal="{{ $formattedHeading }}" class="sr-only sesi-radio" {{ $isSelected ? 'checked' : '' }}>
+                                                                <span class="custom-radio-circle w-4 h-4 rounded-full border {{ $isSelected ? 'border-[#004ADA]' : 'border-gray-300' }} flex items-center justify-center shrink-0 mt-0.5">
+                                                                    <span class="radio-dot w-2 h-2 rounded-full bg-[#004ADA] {{ $isSelected ? '' : 'hidden' }}"></span>
+                                                                </span>
+                                                                <div class="flex-1 min-w-0">
+                                                                    <div class="flex items-center justify-between gap-1">
+                                                                        <span class="text-xs sm:text-sm font-bold {{ $isSelected ? 'text-[#004ADA]' : 'text-[#1F1F1F]' }} sesi-time">{{ $slotTimeLabel }}</span>
+                                                                        <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold {{ $slot->mode === 'Online' ? 'bg-purple-50 text-purple-700 border border-purple-100' : 'bg-blue-50 text-blue-700 border border-blue-100' }}">
+                                                                            {{ $slot->mode }}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div class="text-[11px] text-[#707070] mt-1 space-y-0.5">
+                                                                        <p class="truncate"><span class="text-gray-400">Pewawancara:</span> {{ $slot->pewawancara }}</p>
+                                                                        <p class="truncate"><span class="text-gray-400">Lokasi:</span> {{ $slot->lokasi ?? ($slot->mode === 'Online' ? 'Google Meet' : 'Ruang Diskusi KMID') }}</p>
+                                                                    </div>
+                                                                </div>
+                                                            </label>
+                                                        @else
+                                                            <div class="relative flex items-start gap-3 p-3.5 rounded-xl border border-gray-200 bg-gray-50/70 opacity-60 cursor-not-allowed select-none">
+                                                                <span class="w-4 h-4 rounded-full border border-gray-300 flex items-center justify-center shrink-0 mt-0.5"></span>
+                                                                <div class="flex-1 min-w-0">
+                                                                    <div class="flex items-center justify-between gap-1">
+                                                                        <span class="text-xs sm:text-sm font-medium text-gray-500 line-through">{{ $slotTimeLabel }}</span>
+                                                                        <span class="px-2 py-0.5 rounded-md text-[10px] font-medium bg-gray-200 text-gray-600">Penuh</span>
+                                                                    </div>
+                                                                    <p class="text-[11px] text-gray-400 mt-1 truncate">{{ $slot->pewawancara }}</p>
+                                                                </div>
+                                                            </div>
+                                                        @endif
+                                                    @endforeach
+                                                </div>
+                                            </div>
                                         @endforeach
                                     @else
-                                        @php
-                                            $sesiList = [
-                                                ['time' => '10.00-10.15 WIB', 'duration' => '15 menit'],
-                                                ['time' => '10.15-10.30 WIB', 'duration' => '15 menit'],
-                                                ['time' => '10.30-10.45 WIB', 'duration' => '15 menit'],
-                                                ['time' => '10.45-11.00 WIB', 'duration' => '15 menit'],
-                                                ['time' => '11.00-11.15 WIB', 'duration' => '15 menit'],
-                                                ['time' => '11.15-11.30 WIB', 'duration' => '15 menit'],
-                                            ];
-                                        @endphp
-                                        @foreach($sesiList as $sesi)
-                                            @php $isSelected = ($currentSesi === $sesi['time']); @endphp
-                                            <label class="sesi-card relative flex items-center gap-3 px-4 py-3.5 rounded-xl cursor-pointer transition-all select-none border {{ $isSelected ? 'border-[#004ADA] bg-[#EBF2FE]' : 'border-[#E5E7EB] bg-[#FBFBFA] hover:bg-white' }}">
-                                                <input type="radio" name="jam_wawancara" value="{{ $sesi['time'] }}" class="sr-only sesi-radio" {{ $isSelected ? 'checked' : '' }}>
-                                                <span class="custom-radio-circle w-4 h-4 rounded-full border {{ $isSelected ? 'border-[#004ADA]' : 'border-gray-300' }} flex items-center justify-center shrink-0">
-                                                    <span class="radio-dot w-2 h-2 rounded-full bg-[#004ADA] {{ $isSelected ? '' : 'hidden' }}"></span>
-                                                </span>
-                                                <div>
-                                                    <div class="text-xs sm:text-sm font-semibold {{ $isSelected ? 'text-[#004ADA]' : 'text-[#1F1F1F]' }} sesi-time">{{ $sesi['time'] }}</div>
-                                                    <div class="text-[11px] text-[#9CA3AF]">{{ $sesi['duration'] }}</div>
-                                                </div>
-                                            </label>
-                                        @endforeach
+                                        <div class="p-8 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                                            <div class="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-3">
+                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                            </div>
+                                            <h4 class="text-sm font-bold text-gray-800">Belum Ada Jadwal Wawancara</h4>
+                                            <p class="text-xs text-gray-500 mt-1 max-w-sm mx-auto">Admin belum membuka sesi jadwal wawancara untuk saat ini. Jadwal akan otomatis tampil di sini setelah dibuat oleh Admin atau Staff.</p>
+                                        </div>
                                     @endif
                                 </div>
                             </div>
@@ -973,12 +1000,12 @@
                 card.addEventListener('click', () => {
                     sesiCards.forEach(c => {
                         c.classList.remove('border-[#004ADA]', 'bg-[#EBF2FE]');
-                        c.classList.add('border-[#E5E7EB]', 'bg-[#FBFBFA]');
-                        c.querySelector('.radio-dot').classList.add('hidden');
-                        c.querySelector('.custom-radio-circle').classList.remove('border-[#004ADA]');
-                        c.querySelector('.custom-radio-circle').classList.add('border-gray-300');
-                        c.querySelector('.sesi-time').classList.remove('text-[#004ADA]');
-                        c.querySelector('.sesi-time').classList.add('text-[#1F1F1F]');
+                        c.classList.add('border-[#E5E7EB]', 'bg-white');
+                        c.querySelector('.radio-dot')?.classList.add('hidden');
+                        c.querySelector('.custom-radio-circle')?.classList.remove('border-[#004ADA]');
+                        c.querySelector('.custom-radio-circle')?.classList.add('border-gray-300');
+                        c.querySelector('.sesi-time')?.classList.remove('text-[#004ADA]');
+                        c.querySelector('.sesi-time')?.classList.add('text-[#1F1F1F]');
                     });
 
                     input.checked = true;
@@ -991,14 +1018,27 @@
                         inputHari.value = input.dataset.tanggal;
                     }
                     card.classList.add('border-[#004ADA]', 'bg-[#EBF2FE]');
-                    card.classList.remove('border-[#E5E7EB]', 'bg-[#FBFBFA]');
-                    card.querySelector('.radio-dot').classList.remove('hidden');
-                    card.querySelector('.custom-radio-circle').classList.add('border-[#004ADA]');
-                    card.querySelector('.custom-radio-circle').classList.remove('border-gray-300');
-                    card.querySelector('.sesi-time').classList.add('text-[#004ADA]');
-                    card.querySelector('.sesi-time').classList.remove('text-[#1F1F1F]');
+                    card.classList.remove('border-[#E5E7EB]', 'bg-white');
+                    card.querySelector('.radio-dot')?.classList.remove('hidden');
+                    card.querySelector('.custom-radio-circle')?.classList.add('border-[#004ADA]');
+                    card.querySelector('.custom-radio-circle')?.classList.remove('border-gray-300');
+                    card.querySelector('.sesi-time')?.classList.add('text-[#004ADA]');
+                    card.querySelector('.sesi-time')?.classList.remove('text-[#1F1F1F]');
                 });
             });
+
+            // Pre-fill input_hari_wawancara if slot is already active
+            const checkedSlot = document.querySelector('.sesi-radio:checked');
+            if (checkedSlot) {
+                const hiddenIdInput = document.getElementById('selected_jadwal_id');
+                if (hiddenIdInput && checkedSlot.dataset.jadwalId) {
+                    hiddenIdInput.value = checkedSlot.dataset.jadwalId;
+                }
+                const inputHari = document.getElementById('input_hari_wawancara');
+                if (inputHari && checkedSlot.dataset.tanggal && (!inputHari.value || inputHari.value.includes('Pilih sesi'))) {
+                    inputHari.value = checkedSlot.dataset.tanggal;
+                }
+            }
 
             // File Upload Dropzones
             function setupDropzone(dropzoneId, inputId, labelId, maxMB, allowedExts) {
