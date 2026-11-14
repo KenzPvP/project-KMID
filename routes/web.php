@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\JadwalWawancaraController;
 use App\Http\Controllers\KepengurusanController;
 use App\Http\Controllers\PendaftarController;
 use App\Models\User;
@@ -135,8 +136,12 @@ Route::get('/open-recruitment', function () {
 
     $user = Auth::user();
     $pendaftar = \App\Models\Pendaftar::where('email', $user->email)->first();
+    $availableSlots = \App\Models\JadwalWawancara::where('status', 'Tersedia')
+        ->orderBy('tanggal', 'asc')
+        ->orderBy('jam_mulai', 'asc')
+        ->get();
 
-    return view('open-recruitment', compact('pendaftar'));
+    return view('open-recruitment', compact('pendaftar', 'availableSlots'));
 })->name('open-recruitment');
 
 Route::get('/open-recruitment/check-status', function () {
@@ -248,10 +253,39 @@ Route::post('/open-recruitment/jadwal-wawancara', function (Request $request) {
     $user = Auth::user();
     $pendaftar = \App\Models\Pendaftar::where('email', $user->email)->first();
     if ($pendaftar) {
-        $pendaftar->update([
-            'interview_date' => '8 - 10 Oktober 2026',
-            'interview_time' => $request->jam_wawancara,
-        ]);
+        $jadwalId = $request->input('jadwal_id');
+        $slot = null;
+        if ($jadwalId) {
+            $slot = \App\Models\JadwalWawancara::find($jadwalId);
+        }
+        if (!$slot) {
+            $slot = \App\Models\JadwalWawancara::where('status', 'Tersedia')
+                ->where('jam_mulai', 'like', substr($request->jam_wawancara, 0, 5) . '%')
+                ->first();
+        }
+
+        if ($slot) {
+            // Lepas slot lama jika pendaftar sudah memiliki slot
+            \App\Models\JadwalWawancara::where('pendaftar_id', $pendaftar->id)->update([
+                'status' => 'Tersedia',
+                'pendaftar_id' => null,
+            ]);
+
+            $slot->update([
+                'status' => 'Terisi',
+                'pendaftar_id' => $pendaftar->id,
+            ]);
+
+            $pendaftar->update([
+                'interview_date' => $slot->tanggal_pendek,
+                'interview_time' => $slot->jam_range,
+            ]);
+        } else {
+            $pendaftar->update([
+                'interview_date' => $request->tanggal_wawancara ?? '8 - 10 Oktober 2026',
+                'interview_time' => $request->jam_wawancara,
+            ]);
+        }
     }
 
     return redirect()->route('open-recruitment', ['tab' => 'wawancara'])->with('success', 'Jadwal wawancara berhasil dikonfirmasi untuk sesi ' . $request->jam_wawancara . '!');
@@ -276,13 +310,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::post('/kelola-akun/tambah', [PendaftarController::class, 'store'])->name('pendaftar.store');
     Route::post('/kelola-akun/{pendaftar}/status', [PendaftarController::class, 'updateStatus'])->name('pendaftar.status');
 
-    Route::get('/jadwal-wawancara', function () {
-        return view('admin.jadwal-wawancara');
-    })->name('pendaftar.wawancara');
-
-    Route::get('/jadwal-wawancara/tambah', function () {
-        return view('admin.tambah-jadwal');
-    })->name('pendaftar.tambah-jadwal');
+    Route::get('/jadwal-wawancara', [JadwalWawancaraController::class, 'index'])->name('pendaftar.wawancara');
+    Route::get('/jadwal-wawancara/tambah', [JadwalWawancaraController::class, 'create'])->name('pendaftar.tambah-jadwal');
+    Route::post('/jadwal-wawancara/tambah', [JadwalWawancaraController::class, 'store'])->name('pendaftar.store-jadwal');
+    Route::delete('/jadwal-wawancara/{jadwal}', [JadwalWawancaraController::class, 'destroy'])->name('pendaftar.destroy-jadwal');
+    Route::post('/jadwal-wawancara/{jadwal}/assign', [JadwalWawancaraController::class, 'assignPendaftar'])->name('pendaftar.assign-jadwal');
 
     Route::get('/pengaturan-pendaftaran', function () {
         return view('admin.pengaturan-pendaftaran');
@@ -332,13 +364,11 @@ Route::prefix('staff')->name('staff.')->middleware(['auth', 'role:staff'])->grou
     Route::post('/kelola-akun/tambah', [PendaftarController::class, 'store'])->name('pendaftar.store');
     Route::post('/kelola-akun/{pendaftar}/status', [PendaftarController::class, 'updateStatus'])->name('pendaftar.status');
 
-    Route::get('/jadwal-wawancara', function () {
-        return view('admin.jadwal-wawancara');
-    })->name('pendaftar.wawancara');
-
-    Route::get('/jadwal-wawancara/tambah', function () {
-        return view('admin.tambah-jadwal');
-    })->name('pendaftar.tambah-jadwal');
+    Route::get('/jadwal-wawancara', [JadwalWawancaraController::class, 'index'])->name('pendaftar.wawancara');
+    Route::get('/jadwal-wawancara/tambah', [JadwalWawancaraController::class, 'create'])->name('pendaftar.tambah-jadwal');
+    Route::post('/jadwal-wawancara/tambah', [JadwalWawancaraController::class, 'store'])->name('pendaftar.store-jadwal');
+    Route::delete('/jadwal-wawancara/{jadwal}', [JadwalWawancaraController::class, 'destroy'])->name('pendaftar.destroy-jadwal');
+    Route::post('/jadwal-wawancara/{jadwal}/assign', [JadwalWawancaraController::class, 'assignPendaftar'])->name('pendaftar.assign-jadwal');
 
     Route::get('/pengaturan-pendaftaran', function () {
         return view('admin.pengaturan-pendaftaran');

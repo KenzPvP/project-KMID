@@ -25,4 +25,12 @@ class Pendaftar extends Model
         'interview_date',
         'interview_time',
     ];
+
+    /**
+     * Relasi ke slot wawancara.
+     */
+    public function jadwalWawancara()
+    {
+        return $this->hasOne(JadwalWawancara::class, 'pendaftar_id');
+    }
 }

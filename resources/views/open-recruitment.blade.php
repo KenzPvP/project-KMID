@@ -689,33 +689,61 @@
                                     </div>
                                 </div>
 
-                                <!-- 6 Sesi Jam Wawancara Cards -->
+                                <!-- Sesi Jam Wawancara Cards -->
                                 @php
-                                    $currentSesi = $pendaftar->interview_time ?? '10:15-10:30';
-                                    $sesiList = [
-                                        ['time' => '10:00-10:15', 'duration' => '15 menit'],
-                                        ['time' => '10:15-10:30', 'duration' => '15 menit'],
-                                        ['time' => '10:30-10:45', 'duration' => '15 menit'],
-                                        ['time' => '10:45-11:00', 'duration' => '15 menit'],
-                                        ['time' => '11:00-11:15', 'duration' => '15 menit'],
-                                        ['time' => '11:15-11:30', 'duration' => '15 menit'],
-                                    ];
+                                    $currentSesi = $pendaftar->interview_time ?? '';
+                                    $hasCustomSlots = isset($availableSlots) && $availableSlots->count() > 0;
                                 @endphp
 
+                                <input type="hidden" name="jadwal_id" id="selected_jadwal_id" value="">
+
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="group-sesi-wawancara">
-                                    @foreach($sesiList as $sesi)
-                                        @php $isSelected = ($currentSesi === $sesi['time']); @endphp
-                                        <label class="sesi-card relative flex items-center gap-3 px-4 py-3.5 rounded-xl cursor-pointer transition-all select-none border {{ $isSelected ? 'border-[#004ADA] bg-[#EBF2FE]' : 'border-[#E5E7EB] bg-[#FBFBFA] hover:bg-white' }}">
-                                            <input type="radio" name="jam_wawancara" value="{{ $sesi['time'] }}" class="sr-only sesi-radio" {{ $isSelected ? 'checked' : '' }}>
-                                            <span class="custom-radio-circle w-4 h-4 rounded-full border {{ $isSelected ? 'border-[#004ADA]' : 'border-gray-300' }} flex items-center justify-center shrink-0">
-                                                <span class="radio-dot w-2 h-2 rounded-full bg-[#004ADA] {{ $isSelected ? '' : 'hidden' }}"></span>
-                                            </span>
-                                            <div>
-                                                <div class="text-xs sm:text-sm font-semibold {{ $isSelected ? 'text-[#004ADA]' : 'text-[#1F1F1F]' }} sesi-time">{{ $sesi['time'] }}</div>
-                                                <div class="text-[11px] text-[#9CA3AF]">{{ $sesi['duration'] }}</div>
-                                            </div>
-                                        </label>
-                                    @endforeach
+                                    @if($hasCustomSlots)
+                                        @foreach($availableSlots as $slot)
+                                            @php
+                                                $slotTimeLabel = $slot->jam_range;
+                                                $isSelected = ($currentSesi === $slotTimeLabel || ($pendaftar && $pendaftar->id === $slot->pendaftar_id));
+                                            @endphp
+                                            <label class="sesi-card relative flex items-center gap-3 px-4 py-3.5 rounded-xl cursor-pointer transition-all select-none border {{ $isSelected ? 'border-[#004ADA] bg-[#EBF2FE]' : 'border-[#E5E7EB] bg-[#FBFBFA] hover:bg-white' }}">
+                                                <input type="radio" name="jam_wawancara" value="{{ $slotTimeLabel }}" data-jadwal-id="{{ $slot->id }}" class="sr-only sesi-radio" {{ $isSelected ? 'checked' : '' }}>
+                                                <span class="custom-radio-circle w-4 h-4 rounded-full border {{ $isSelected ? 'border-[#004ADA]' : 'border-gray-300' }} flex items-center justify-center shrink-0">
+                                                    <span class="radio-dot w-2 h-2 rounded-full bg-[#004ADA] {{ $isSelected ? '' : 'hidden' }}"></span>
+                                                </span>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="text-xs sm:text-sm font-semibold {{ $isSelected ? 'text-[#004ADA]' : 'text-[#1F1F1F]' }} sesi-time">{{ $slotTimeLabel }}</div>
+                                                    <div class="text-[11px] text-[#707070] flex items-center gap-2 mt-0.5">
+                                                        <span>{{ $slot->tanggal_pendek }}</span>
+                                                        <span>·</span>
+                                                        <span class="font-medium text-[#004ADA]">{{ $slot->mode }}</span>
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        @endforeach
+                                    @else
+                                        @php
+                                            $sesiList = [
+                                                ['time' => '10.00-10.15 WIB', 'duration' => '15 menit'],
+                                                ['time' => '10.15-10.30 WIB', 'duration' => '15 menit'],
+                                                ['time' => '10.30-10.45 WIB', 'duration' => '15 menit'],
+                                                ['time' => '10.45-11.00 WIB', 'duration' => '15 menit'],
+                                                ['time' => '11.00-11.15 WIB', 'duration' => '15 menit'],
+                                                ['time' => '11.15-11.30 WIB', 'duration' => '15 menit'],
+                                            ];
+                                        @endphp
+                                        @foreach($sesiList as $sesi)
+                                            @php $isSelected = ($currentSesi === $sesi['time']); @endphp
+                                            <label class="sesi-card relative flex items-center gap-3 px-4 py-3.5 rounded-xl cursor-pointer transition-all select-none border {{ $isSelected ? 'border-[#004ADA] bg-[#EBF2FE]' : 'border-[#E5E7EB] bg-[#FBFBFA] hover:bg-white' }}">
+                                                <input type="radio" name="jam_wawancara" value="{{ $sesi['time'] }}" class="sr-only sesi-radio" {{ $isSelected ? 'checked' : '' }}>
+                                                <span class="custom-radio-circle w-4 h-4 rounded-full border {{ $isSelected ? 'border-[#004ADA]' : 'border-gray-300' }} flex items-center justify-center shrink-0">
+                                                    <span class="radio-dot w-2 h-2 rounded-full bg-[#004ADA] {{ $isSelected ? '' : 'hidden' }}"></span>
+                                                </span>
+                                                <div>
+                                                    <div class="text-xs sm:text-sm font-semibold {{ $isSelected ? 'text-[#004ADA]' : 'text-[#1F1F1F]' }} sesi-time">{{ $sesi['time'] }}</div>
+                                                    <div class="text-[11px] text-[#9CA3AF]">{{ $sesi['duration'] }}</div>
+                                                </div>
+                                            </label>
+                                        @endforeach
+                                    @endif
                                 </div>
                             </div>
 
@@ -959,6 +987,10 @@
                     });
 
                     input.checked = true;
+                    const hiddenIdInput = document.getElementById('selected_jadwal_id');
+                    if (hiddenIdInput && input.dataset.jadwalId) {
+                        hiddenIdInput.value = input.dataset.jadwalId;
+                    }
                     card.classList.add('border-[#004ADA]', 'bg-[#EBF2FE]');
                     card.classList.remove('border-[#E5E7EB]', 'bg-[#FBFBFA]');
                     card.querySelector('.radio-dot').classList.remove('hidden');
