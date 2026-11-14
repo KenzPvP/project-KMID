@@ -69,7 +69,7 @@ class PendaftarController extends Controller
             'cv_url' => ['nullable', 'url', 'max:255'],
             'status' => ['nullable', 'string', 'max:50'],
             'motivation' => ['nullable', 'string'],
-            'role' => ['nullable', 'string', 'in:pendaftar,staff'],
+            'role' => ['nullable', 'string', 'in:pendaftar,staff,admin'],
             'password' => ['nullable', 'string', 'min:8'],
         ], [
             'name.required' => 'Nama lengkap wajib diisi.',
@@ -128,7 +128,7 @@ class PendaftarController extends Controller
 
         $isStaff = $request->is('staff*');
         $redirectRoute = $isStaff ? 'staff.pendaftar.index' : 'admin.pendaftar.index';
-        $roleTitle = $role === 'staff' ? 'Staff' : 'Pendaftar';
+        $roleTitle = $role === 'admin' ? 'Administrator' : ($role === 'staff' ? 'Staff' : 'Pendaftar');
 
         return redirect()->route($redirectRoute)->with('success', "Akun {$roleTitle} '{$pendaftar->name}' berhasil ditambahkan! Akun dapat login menggunakan email '{$pendaftar->email}' dan kata sandi: '{$plainPassword}'.");
     }

@@ -52,13 +52,23 @@
             <div class="hidden md:block">
                 @auth
                     @if(auth()->user()->role === 'admin')
-                        <a href="{{ route('admin.pendaftar.index') }}" class="inline-flex items-center justify-center px-6 py-2.5 bg-[#004ADA] text-white font-semibold text-sm rounded-full transition-all duration-300 hover:bg-[#003bb0] hover:shadow-lg hover:shadow-blue-500/25 active:scale-95">
-                            Dashboard Admin
-                        </a>
+                        <div class="flex items-center gap-2">
+                            <a href="{{ route('open-recruitment') }}" class="inline-flex items-center justify-center px-4 py-2 border border-[#004ADA] text-[#004ADA] hover:bg-blue-50 font-semibold text-xs rounded-full transition-all">
+                                Portal Oprec
+                            </a>
+                            <a href="{{ route('admin.pendaftar.index') }}" class="inline-flex items-center justify-center px-5 py-2.5 bg-[#004ADA] text-white font-semibold text-xs rounded-full transition-all duration-300 hover:bg-[#003bb0] hover:shadow-lg hover:shadow-blue-500/25 active:scale-95">
+                                Dashboard Admin
+                            </a>
+                        </div>
                     @elseif(auth()->user()->role === 'staff')
-                        <a href="{{ route('staff.pendaftar.index') }}" class="inline-flex items-center justify-center px-6 py-2.5 bg-[#FEA515] text-white font-semibold text-sm rounded-full transition-all duration-300 hover:bg-[#EE9401] hover:shadow-lg hover:shadow-orange-500/25 active:scale-95">
-                            Dashboard Staff
-                        </a>
+                        <div class="flex items-center gap-2">
+                            <a href="{{ route('open-recruitment') }}" class="inline-flex items-center justify-center px-4 py-2 border border-[#FEA515] text-[#FEA515] hover:bg-amber-50 font-semibold text-xs rounded-full transition-all">
+                                Portal Oprec
+                            </a>
+                            <a href="{{ route('staff.pendaftar.index') }}" class="inline-flex items-center justify-center px-5 py-2.5 bg-[#FEA515] text-white font-semibold text-xs rounded-full transition-all duration-300 hover:bg-[#EE9401] hover:shadow-lg hover:shadow-orange-500/25 active:scale-95">
+                                Dashboard Staff
+                            </a>
+                        </div>
                     @else
                         <a href="{{ route('open-recruitment') }}" class="inline-flex items-center justify-center px-6 py-2.5 bg-[#FEA515] text-white font-semibold text-sm rounded-full transition-all duration-300 hover:bg-[#EE9401] hover:shadow-lg hover:shadow-orange-500/25 active:scale-95">
                             Dashboard Oprec
@@ -104,13 +114,23 @@
             <div class="pt-2 border-t border-slate-100">
                 @auth
                     @if(auth()->user()->role === 'admin')
-                        <a href="{{ route('admin.pendaftar.index') }}" class="block w-full text-center px-5 py-3 bg-[#004ADA] text-white font-semibold text-sm rounded-full shadow-md">
-                            Dashboard Admin
-                        </a>
+                        <div class="flex flex-col gap-2">
+                            <a href="{{ route('admin.pendaftar.index') }}" class="block w-full text-center px-5 py-2.5 bg-[#004ADA] text-white font-semibold text-sm rounded-full shadow-md">
+                                Dashboard Admin
+                            </a>
+                            <a href="{{ route('open-recruitment') }}" class="block w-full text-center px-5 py-2 border border-[#004ADA] text-[#004ADA] font-semibold text-sm rounded-full hover:bg-blue-50">
+                                Portal Oprec (Pendaftar)
+                            </a>
+                        </div>
                     @elseif(auth()->user()->role === 'staff')
-                        <a href="{{ route('staff.pendaftar.index') }}" class="block w-full text-center px-5 py-3 bg-[#FEA515] text-white font-semibold text-sm rounded-full shadow-md">
-                            Dashboard Staff
-                        </a>
+                        <div class="flex flex-col gap-2">
+                            <a href="{{ route('staff.pendaftar.index') }}" class="block w-full text-center px-5 py-2.5 bg-[#FEA515] text-white font-semibold text-sm rounded-full shadow-md">
+                                Dashboard Staff
+                            </a>
+                            <a href="{{ route('open-recruitment') }}" class="block w-full text-center px-5 py-2 border border-[#FEA515] text-[#FEA515] font-semibold text-sm rounded-full hover:bg-amber-50">
+                                Portal Oprec (Pendaftar)
+                            </a>
+                        </div>
                     @else
                         <a href="{{ route('open-recruitment') }}" class="block w-full text-center px-5 py-3 bg-[#FEA515] text-white font-semibold text-sm rounded-full shadow-md">
                             Dashboard Oprec

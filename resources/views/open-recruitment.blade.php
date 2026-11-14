@@ -1,5 +1,6 @@
 @php
-    $isBerkasDiterima = $pendaftar && in_array($pendaftar->status, ['Lolos Berkas', 'Lolos Wawancara', 'Diterima']);
+    $isAdmin = auth()->check() && (auth()->user()->role === 'admin' || auth()->user()->role === 'staff');
+    $isBerkasDiterima = ($pendaftar && in_array($pendaftar->status, ['Lolos Berkas', 'Lolos Wawancara', 'Diterima'])) || $isAdmin;
     $hasRegistered = !empty($pendaftar);
     $activeTab = request('tab', ($isBerkasDiterima ? 'wawancara' : 'pendaftaran'));
 
@@ -143,10 +144,22 @@
                     </div>
 
                     <span class="text-xs sm:text-sm font-normal text-[#707070]">Portal pendaftar KMID</span>
+                    @if(auth()->check() && (auth()->user()->role === 'admin' || auth()->user()->role === 'staff'))
+                        <span class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold {{ auth()->user()->role === 'admin' ? 'bg-blue-50 text-[#004ADA] border border-blue-200' : 'bg-amber-50 text-[#FEA515] border border-amber-200' }}">
+                            <span class="w-1.5 h-1.5 rounded-full {{ auth()->user()->role === 'admin' ? 'bg-[#004ADA]' : 'bg-[#FEA515]' }}"></span>
+                            <span>Akses Penuh: {{ ucfirst(auth()->user()->role) }}</span>
+                        </span>
+                    @endif
                 </div>
 
                 <!-- Right: Notifications & Profile Details -->
                 <div class="flex items-center gap-3 sm:gap-6">
+                    @if(auth()->check() && (auth()->user()->role === 'admin' || auth()->user()->role === 'staff'))
+                        <a href="{{ auth()->user()->role === 'admin' ? route('admin.pendaftar.index') : route('staff.pendaftar.index') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#004ADA] text-xs font-semibold transition-colors shadow-2xs">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                            <span>Dashboard {{ auth()->user()->role === 'admin' ? 'Admin' : 'Staff' }}</span>
+                        </a>
+                    @endif
                     <!-- Notification Bell -->
                     <button type="button" class="p-2 text-gray-400 hover:text-gray-600 transition-colors relative" aria-label="Notifikasi">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

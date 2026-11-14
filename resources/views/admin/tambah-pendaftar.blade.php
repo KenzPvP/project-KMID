@@ -183,6 +183,9 @@
                         <select id="role" name="role" required class="w-full appearance-none bg-white border @error('role') border-red-400 @else border-gray-200 @enderror rounded-xl px-4 py-2.5 pr-8 text-xs sm:text-sm text-[#1F1F1F] focus:outline-none focus:border-[#004ADA] cursor-pointer">
                             <option value="pendaftar" {{ old('role', request('role', 'pendaftar')) === 'pendaftar' ? 'selected' : '' }}>Pendaftar (Oprec KMID)</option>
                             <option value="staff" {{ old('role', request('role', 'pendaftar')) === 'staff' ? 'selected' : '' }}>Staff (Akses Dashboard Pengelolaan)</option>
+                            @if(auth()->check() && auth()->user()->role === 'admin')
+                                <option value="admin" {{ old('role', request('role', 'pendaftar')) === 'admin' ? 'selected' : '' }}>Administrator (Akses Penuh Seluruh Sistem)</option>
+                            @endif
                         </select>
                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

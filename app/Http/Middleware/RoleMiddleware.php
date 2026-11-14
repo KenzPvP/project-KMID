@@ -24,8 +24,8 @@ class RoleMiddleware
             ]);
         }
 
-        // Admin memiliki hak akses penuh ke semua halaman yang dilindungi role
-        if ($user->role === 'admin') {
+        // Admin memiliki hak akses penuh ke semua halaman dan fitur sistem tanpa batasan
+        if ($user && (method_exists($user, 'isAdmin') ? $user->isAdmin() : strtolower(trim($user->role ?? '')) === 'admin')) {
             return $next($request);
         }
 

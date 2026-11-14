@@ -29,4 +29,20 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Cek apakah user memiliki peran Administrator (akses penuh).
+     */
+    public function isAdmin(): bool
+    {
+        return strtolower(trim($this->role ?? '')) === 'admin';
+    }
+
+    /**
+     * Cek apakah user memiliki peran Staff atau Admin.
+     */
+    public function isStaff(): bool
+    {
+        return in_array(strtolower(trim($this->role ?? '')), ['staff', 'admin'], true);
+    }
 }

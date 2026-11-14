@@ -139,6 +139,19 @@ Route::get('/open-recruitment', function () {
         ->orWhere('name', $user->name)
         ->first();
 
+    if (!$pendaftar && ($user->isAdmin() || $user->role === 'admin')) {
+        $pendaftar = \App\Models\Pendaftar::firstOrCreate(
+            ['email' => $user->email],
+            [
+                'name' => $user->name,
+                'nim' => 'ADMIN-UGM',
+                'major' => 'Administrator KMID',
+                'division' => 'Media Creative',
+                'status' => 'Lolos Berkas',
+            ]
+        );
+    }
+
     $availableSlots = \App\Models\JadwalWawancara::where(function($q) use ($pendaftar) {
         $q->where('status', 'Tersedia');
         if ($pendaftar) {
@@ -164,8 +177,22 @@ Route::get('/open-recruitment/check-status', function () {
     $pendaftar = \App\Models\Pendaftar::where('email', $user->email)
         ->orWhere('name', $user->name)
         ->first();
+
+    if (!$pendaftar && ($user->isAdmin() || $user->role === 'admin')) {
+        $pendaftar = \App\Models\Pendaftar::firstOrCreate(
+            ['email' => $user->email],
+            [
+                'name' => $user->name,
+                'nim' => 'ADMIN-UGM',
+                'major' => 'Administrator KMID',
+                'division' => 'Media Creative',
+                'status' => 'Lolos Berkas',
+            ]
+        );
+    }
     $status = $pendaftar->status ?? null;
-    $isBerkasDiterima = $pendaftar && in_array($status, ['Lolos Berkas', 'Lolos Wawancara', 'Diterima']);
+    $isAdmin = $user && (method_exists($user, 'isAdmin') ? $user->isAdmin() : $user->role === 'admin');
+    $isBerkasDiterima = ($pendaftar && in_array($status, ['Lolos Berkas', 'Lolos Wawancara', 'Diterima'])) || $isAdmin;
 
     return response()->json([
         'hasRegistered' => !empty($pendaftar),
@@ -271,6 +298,19 @@ Route::post('/open-recruitment/jadwal-wawancara', function (Request $request) {
     $pendaftar = \App\Models\Pendaftar::where('email', $user->email)
         ->orWhere('name', $user->name)
         ->first();
+
+    if (!$pendaftar && ($user->isAdmin() || $user->role === 'admin')) {
+        $pendaftar = \App\Models\Pendaftar::firstOrCreate(
+            ['email' => $user->email],
+            [
+                'name' => $user->name,
+                'nim' => 'ADMIN-UGM',
+                'major' => 'Administrator KMID',
+                'division' => 'Media Creative',
+                'status' => 'Lolos Berkas',
+            ]
+        );
+    }
     if ($pendaftar) {
         $updateData = [];
         if ($request->filled('nama_lengkap')) {

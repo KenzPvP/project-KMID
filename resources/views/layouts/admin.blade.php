@@ -115,7 +115,7 @@
                     </nav>
                 </div>
 
-                @if(!$isStaff)
+                @if(auth()->check() && (auth()->user()->role === 'admin' || !$isStaff))
                 <!-- Navigation Section 2: PENGELOLAAN KONTEN (Tampil penuh untuk Administrator, disembunyikan untuk Staff/Manager) -->
                 <div class="px-5 pt-5 pb-2 border-t border-gray-100 mt-2">
                     <span class="text-[11px] font-semibold text-[#8E8E93] uppercase tracking-wider block mb-3">PENGELOLAAN KONTEN</span>
@@ -188,6 +188,27 @@
                     </nav>
                 </div>
                 @endif
+
+                <!-- Navigation Section 3: PORTAL PENDAFTAR (OPREC) -->
+                <div class="px-5 pt-5 pb-2 border-t border-gray-100 mt-2">
+                    <span class="text-[11px] font-semibold text-[#8E8E93] uppercase tracking-wider block mb-3">PORTAL PENDAFTAR</span>
+                    
+                    <nav class="space-y-1.5">
+                        <a href="{{ route('open-recruitment') }}" target="_blank" class="w-full flex items-center justify-between px-3.5 py-3 rounded-xl transition-all duration-200 text-left group text-[#707070] font-medium hover:bg-slate-50 hover:text-[#1F1F1F]">
+                            <div class="flex items-center gap-3">
+                                <div class="w-5 h-5 shrink-0 flex items-center justify-center text-[#FEA515]">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                    </svg>
+                                </div>
+                                <span class="text-xs sm:text-sm tracking-tight">Lihat Portal Oprec</span>
+                            </div>
+                            <span class="text-[10px] text-[#004ADA] font-semibold flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform">
+                                <span>Buka ↗</span>
+                            </span>
+                        </a>
+                    </nav>
+                </div>
             </div>
 
             <!-- Bottom Information -->
@@ -315,6 +336,9 @@
                             </div>
 
                             <div class="py-1">
+                                <a href="{{ route('open-recruitment') }}" class="block px-4 py-2 text-xs text-[#004ADA] hover:bg-blue-50 transition-colors font-semibold">
+                                    Lihat Portal Oprec (Pendaftar)
+                                </a>
                                 <a href="{{ route('home') }}" class="block px-4 py-2 text-xs text-[#707070] hover:text-[#1F1F1F] hover:bg-slate-50 transition-colors">
                                     Kembali ke Beranda Publik
                                 </a>
