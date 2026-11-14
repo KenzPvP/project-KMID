@@ -669,7 +669,7 @@
                                         <!-- 3. Hari Wawancara -->
                                         <div>
                                             <label class="block text-sm font-semibold text-[#1F1F1F] mb-1.5">3. Hari Wawancara</label>
-                                            <input type="text" value="{{ $pendaftar->interview_date ?? '8 - 10 Oktober 2026' }}" disabled readonly class="w-full px-4 py-3 bg-[#ECECEC] border border-transparent rounded-xl text-sm text-[#555555] font-medium cursor-not-allowed select-none">
+                                            <input type="text" id="input_hari_wawancara" name="tanggal_wawancara" value="{{ $pendaftar->interview_date ?? 'Pilih sesi di bawah' }}" disabled readonly class="w-full px-4 py-3 bg-[#ECECEC] border border-transparent rounded-xl text-sm text-[#555555] font-medium cursor-not-allowed select-none">
                                         </div>
                                     </div>
                                 </div>
@@ -705,7 +705,7 @@
                                                 $isSelected = ($currentSesi === $slotTimeLabel || ($pendaftar && $pendaftar->id === $slot->pendaftar_id));
                                             @endphp
                                             <label class="sesi-card relative flex items-center gap-3 px-4 py-3.5 rounded-xl cursor-pointer transition-all select-none border {{ $isSelected ? 'border-[#004ADA] bg-[#EBF2FE]' : 'border-[#E5E7EB] bg-[#FBFBFA] hover:bg-white' }}">
-                                                <input type="radio" name="jam_wawancara" value="{{ $slotTimeLabel }}" data-jadwal-id="{{ $slot->id }}" class="sr-only sesi-radio" {{ $isSelected ? 'checked' : '' }}>
+                                                <input type="radio" name="jam_wawancara" value="{{ $slotTimeLabel }}" data-jadwal-id="{{ $slot->id }}" data-tanggal="{{ $slot->tanggal_pendek }}" class="sr-only sesi-radio" {{ $isSelected ? 'checked' : '' }}>
                                                 <span class="custom-radio-circle w-4 h-4 rounded-full border {{ $isSelected ? 'border-[#004ADA]' : 'border-gray-300' }} flex items-center justify-center shrink-0">
                                                     <span class="radio-dot w-2 h-2 rounded-full bg-[#004ADA] {{ $isSelected ? '' : 'hidden' }}"></span>
                                                 </span>
@@ -990,6 +990,10 @@
                     const hiddenIdInput = document.getElementById('selected_jadwal_id');
                     if (hiddenIdInput && input.dataset.jadwalId) {
                         hiddenIdInput.value = input.dataset.jadwalId;
+                    }
+                    const inputHari = document.getElementById('input_hari_wawancara');
+                    if (inputHari && input.dataset.tanggal) {
+                        inputHari.value = input.dataset.tanggal;
                     }
                     card.classList.add('border-[#004ADA]', 'bg-[#EBF2FE]');
                     card.classList.remove('border-[#E5E7EB]', 'bg-[#FBFBFA]');
