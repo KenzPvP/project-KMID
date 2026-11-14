@@ -253,6 +253,15 @@ Route::post('/open-recruitment/jadwal-wawancara', function (Request $request) {
     $user = Auth::user();
     $pendaftar = \App\Models\Pendaftar::where('email', $user->email)->first();
     if ($pendaftar) {
+        $updateData = [];
+        if ($request->filled('nama_lengkap')) {
+            $updateData['name'] = $request->nama_lengkap;
+            $user->update(['name' => $request->nama_lengkap]);
+        }
+        if ($request->filled('divisi')) {
+            $updateData['division'] = $request->divisi;
+        }
+
         $jadwalId = $request->input('jadwal_id');
         $slot = null;
         if ($jadwalId) {
@@ -276,16 +285,14 @@ Route::post('/open-recruitment/jadwal-wawancara', function (Request $request) {
                 'pendaftar_id' => $pendaftar->id,
             ]);
 
-            $pendaftar->update([
-                'interview_date' => $slot->tanggal_pendek,
-                'interview_time' => $slot->jam_range,
-            ]);
+            $updateData['interview_date'] = $slot->tanggal_pendek;
+            $updateData['interview_time'] = $slot->jam_range;
         } else {
-            $pendaftar->update([
-                'interview_date' => $request->tanggal_wawancara ?? '8 - 10 Oktober 2026',
-                'interview_time' => $request->jam_wawancara,
-            ]);
+            $updateData['interview_date'] = $request->tanggal_wawancara ?? $pendaftar->interview_date ?? '8 - 10 Oktober 2026';
+            $updateData['interview_time'] = $request->jam_wawancara;
         }
+
+        $pendaftar->update($updateData);
     }
 
     return redirect()->route('open-recruitment', ['tab' => 'wawancara'])->with('success', 'Jadwal wawancara berhasil dikonfirmasi untuk sesi ' . $request->jam_wawancara . '!');
