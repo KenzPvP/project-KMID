@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\JadwalWawancaraController;
 use App\Http\Controllers\KepengurusanController;
 use App\Http\Controllers\PendaftarController;
@@ -77,6 +78,10 @@ Route::post('/login', function (Request $request) {
         'email' => 'Email atau kata sandi yang dimasukkan tidak sesuai.',
     ])->onlyInput('email');
 });
+
+// Otentikasi Google OAuth khusus email UGM (@mail.ugm.ac.id / @ugm.ac.id)
+Route::get('/auth/google', [GoogleAuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 
 Route::get('/register', function () {
     if (Auth::check()) {
